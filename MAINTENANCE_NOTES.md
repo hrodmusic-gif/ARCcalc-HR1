@@ -96,3 +96,10 @@ Safari and Chrome do not guarantee orientation locking for a normal browser tab.
 - Keeps a conservative gap below the Dynamic Island rather than using the entire safe-area inset as empty spacing.
 - Returns the recovered height to the keypad automatically.
 - Preserves the approved v5.12/v5.13 bottom navigation dimensions and unified top color.
+
+
+## v5.15 Logo clearance
+- Reduced the modern-iPhone header lift from 20px to 10px so the full blue arc remains visible.
+- Fixed the logo wrapper at 82px on tall installed iPhones to prevent internal clipping.
+- Allows the brand and logo wrapper to overflow visibly while keeping the app viewport clipped.
+- Preserves the approved bottom navigation, key sizing, full-screen layout, and unified top color.

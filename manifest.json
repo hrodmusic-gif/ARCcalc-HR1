@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 v5.14 steel fabrication calculator with Dynamic Island-aware iPhone logo placement.",
+  "description": "ARCcalc HR1 v5.15 steel fabrication calculator with unclipped Dynamic Island-aware logo placement.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
