@@ -4900,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.11 Stretched Keys -->
+  <!-- ARCcalc HR1 v5.12 Native Bottom Bar -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5441,7 +5441,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>v5.11 <span class="version-pill">stretched keys</span></strong>
+                <strong>v5.12 <span class="version-pill">native bottom bar</span></strong>
               </div>
             </section>
 
@@ -7605,16 +7605,18 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     }
   </style>
 
-  <style id="arccalc-stretched-keys-v511">
-    /* ARCcalc HR1 v5.11 — compact bottom navigation and taller keys.
-       The navigation surface still covers the iPhone Home-indicator safe area,
-       but the visible tab buttons use a compact 42px control row. Every pixel
-       reclaimed from navigation is automatically distributed across all eight
-       keypad rows by the minmax(0,1fr) grid. */
+  <style id="arccalc-native-bottom-bar-v512">
+    /* ARCcalc HR1 v5.12 — native-feeling iPhone bottom bar.
+       v5.11 correctly filled the screen, but preserved the full iOS bottom
+       safe-area as empty space below the controls. This revision keeps enough
+       clearance for the Home indicator while pulling the controls lower,
+       shortening the panel, and returning the recovered height to the keypad. */
     :root{
       --arc-layout-height:var(--arc-live-height,100dvh);
-      --arc-tab-control-height:42px;
-      --arc-tab-row-height:calc(var(--arc-tab-control-height) + var(--arc-ui-bottom));
+      --arc-tab-button-height:40px;
+      --arc-tab-top-pad:4px;
+      --arc-tab-bottom-pad:max(12px, calc(var(--arc-ui-bottom) - 18px));
+      --arc-tab-row-height:calc(var(--arc-tab-top-pad) + var(--arc-tab-button-height) + var(--arc-tab-bottom-pad));
     }
 
     @media(max-width:520px) and (orientation:portrait){
@@ -7644,27 +7646,33 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       }
       .app-tabs{
         align-self:stretch!important;
-        align-items:start!important;
+        align-items:center!important;
         min-height:0!important;
         max-height:100%!important;
         height:100%!important;
         margin:0!important;
-        padding:3px 5px var(--arc-ui-bottom)!important;
+        padding:var(--arc-tab-top-pad) 6px var(--arc-tab-bottom-pad)!important;
         box-sizing:border-box!important;
         overflow:hidden!important;
         background:#070d15!important;
+        border-top-left-radius:23px!important;
+        border-top-right-radius:23px!important;
       }
       .app-tab{
-        align-self:start!important;
-        height:calc(var(--arc-tab-control-height) - 6px)!important;
-        min-height:calc(var(--arc-tab-control-height) - 6px)!important;
-        max-height:calc(var(--arc-tab-control-height) - 6px)!important;
-        padding:0 4px!important;
-        border-radius:11px!important;
+        align-self:center!important;
+        height:var(--arc-tab-button-height)!important;
+        min-height:var(--arc-tab-button-height)!important;
+        max-height:var(--arc-tab-button-height)!important;
+        padding:0 5px!important;
+        border-radius:12px!important;
         box-sizing:border-box!important;
         font-size:clamp(10px,2.8vw,12px)!important;
         line-height:1!important;
         gap:5px!important;
+        transform:none!important;
+      }
+      .app-tab.is-active{
+        border-radius:13px!important;
       }
       .tab-icon{font-size:clamp(13px,3.8vw,16px)!important}
     }
@@ -7732,20 +7740,18 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       }
     }
 
-    /* Keep the navigation compact even on short legacy iPhones. */
+    /* Short legacy phones need an even tighter control row. */
     @media(max-width:520px) and (orientation:portrait) and (max-height:700px){
-      :root{--arc-tab-control-height:40px}
-      .app-tabs{padding-top:2px!important}
-      .app-tab{
-        height:36px!important;
-        min-height:36px!important;
-        max-height:36px!important;
-        font-size:10px!important;
+      :root{
+        --arc-tab-button-height:36px;
+        --arc-tab-top-pad:2px;
+        --arc-tab-bottom-pad:max(8px, calc(var(--arc-ui-bottom) - 18px));
       }
+      .app-tab{font-size:10px!important}
     }
   </style>
 
-  <script id="arccalc-responsive-runtime-v511">
+  <script id="arccalc-responsive-runtime-v512">
   (()=>{
     const root=document.documentElement;
     const body=document.body;

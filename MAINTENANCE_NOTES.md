@@ -74,3 +74,11 @@ Safari and Chrome do not guarantee orientation locking for a normal browser tab.
 - Removed safe-area padding from inside each tab button so the active pill is no longer oversized.
 - Redistributed all reclaimed vertical space evenly across the eight keypad rows.
 - Retained the v5.10 full-screen Home Screen viewport correction.
+
+
+## v5.12 native bottom bar
+- Reduced the unused space below the bottom tabs on iPhone Home Screen installs.
+- Lowered and vertically centered the three tab controls inside the navigation surface.
+- Retained enough clearance for the iPhone Home indicator without reserving the entire safe area as blank space.
+- Returned the reclaimed height to all eight keypad rows.
+- Kept the v5.10/v5.11 full-screen standalone viewport correction.

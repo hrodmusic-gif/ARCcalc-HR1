@@ -1,4 +1,4 @@
-const CACHE_NAME = "arccalc-hr1-v5-11-stretched-keys";
+const CACHE_NAME = "arccalc-hr1-v5-12-native-bottom-bar";
 const APP_SHELL = [
   "./",
   "./index.html",
