@@ -4875,10 +4875,10 @@ body:after{
 <!-- ARCcalc HR1 v1.1 Official -->
 <!-- ARCcalc HR1 v1.1 Official -->
 <!-- ARCcalc HR1 v1.2 Remove Heat Top Unit -->
-<!-- ARCcalc HR1 v1.5 History and Weld Stopwatch -->
+<!-- ARCcalc HR1 v1.6 History and Weld Stopwatch -->
 <!-- ARCcalc HR1 v1.3 Settings Cutoff Fix -->
-<!-- ARCcalc HR1 v1.5 iPhone Full Screen -->
-<!-- ARCcalc HR1 v1.5 iPhone Fit Fix -->
+<!-- ARCcalc HR1 v1.6 iPhone Full Screen -->
+<!-- ARCcalc HR1 v1.6 iPhone Fit Fix -->
 <!-- ARCcalc HR1 v2.9 Compact Display Spacing -->
 <!-- ARCcalc HR1 v3.0 Maintenance Pass: consolidated release metadata; runtime logic preserved -->
 <!-- ARCcalc HR1 v3.1 Shapes Text and Dimensions Cleanup -->
@@ -5375,7 +5375,7 @@ body:after{
 
 
 <style id="arccalc-v1-4-history-stopwatch">
-/* ARCcalc HR1 v1.5 — calculation history and weld stopwatch */
+/* ARCcalc HR1 v1.6 — calculation history and weld stopwatch */
 .brand{position:relative}
 .history-trigger{
   position:absolute!important;right:2px;bottom:2px;width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;
@@ -5439,8 +5439,8 @@ body:after{
 }
 </style>
 
-<style id="arccalc-v1-5-compact-weld">
-/* ARCcalc HR1 v1.5 — compact Travel Speed workflow */
+<style id="arccalc-v1-6-stability">
+/* ARCcalc HR1 v1.6 — compact Travel Speed workflow and stability repairs */
 .ipm-card-heading{margin-bottom:10px!important}
 .ipm-reset-button{
   width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;display:grid!important;place-items:center!important;
@@ -5570,9 +5570,15 @@ body:after{
 
             <div class="settings-group-label">Calculator Guide</div>
             <section class="settings-card v1-settings-card calculator-guide-card">
-              <h3>Calculator Guide</h3>
-              <p class="settings-note">Exact button order for common field calculations. Enter the number before its unit or construction key.</p>
-              <div class="calculator-guide-list">
+              <details class="calculator-guide-details">
+                <summary>
+                  <span class="calculator-guide-summary-copy">
+                    <strong>Calculator Guide</strong>
+                    <small>Button sequences, unit rules, examples, and error behavior</small>
+                  </span>
+                </summary>
+                <p class="settings-note calculator-guide-intro">Exact button order for common field calculations. Enter the number before its unit or construction key.</p>
+                <div class="calculator-guide-list">
                 <div class="calculator-guide-item"><strong>Basic arithmetic</strong><span>Enter the first value, press <kbd>+</kbd>, <kbd>−</kbd>, <kbd>×</kbd>, or <kbd>÷</kbd>, enter the second value, then press <kbd>=</kbd>.</span><em>Example: <kbd>25</kbd> <kbd>×</kbd> <kbd>4</kbd> <kbd>=</kbd> → 100</em></div>
                 <div class="calculator-guide-item"><strong>Feet, inches, and fractions</strong><span>Enter feet, press <kbd>Feet</kbd>, enter inches, press <kbd>Inch</kbd>, then enter the numerator, <kbd>/</kbd>, and denominator.</span><em>Example: <kbd>5</kbd> <kbd>Feet</kbd> <kbd>4</kbd> <kbd>Inch</kbd> <kbd>15</kbd> <kbd>/</kbd> <kbd>16</kbd> → 5 ft 4 15/16 in</em></div>
                 <div class="calculator-guide-item"><strong>Mixed measurement math</strong><span>Measurements may be added, subtracted, multiplied by a number, or divided by a number. ARCcalc keeps the dimensional unit.</span><em>Example: 5 ft 4 in <kbd>+</kbd> 2 ft 8 in <kbd>=</kbd> → 8 ft 0 in</em></div>
@@ -5587,13 +5593,14 @@ body:after{
                 <div class="calculator-guide-item"><strong>Calculation history</strong><span>Tap the clock-arrow icon beside the ARCcalc logo to view the last 20 completed calculations. Tap any entry to restore its result and unit to the calculator. Clear removes the current entry but does not erase saved history.</span></div>
               <div class="calculator-guide-item"><strong>Travel speed and stopwatch</strong><span>Open the Weld tab and choose <kbd>Manual</kbd> to select minutes and seconds, or <kbd>Stopwatch</kbd> to time the weld directly. In Stopwatch mode, press <kbd>Start</kbd> when the arc begins and <kbd>Stop</kbd> at the end of the measured weld. Select the completed weld length, calculate IPM, then use <kbd>Use in Heat Input</kbd> to transfer the result.</span></div>
               <div class="calculator-guide-item"><strong>Editing and clearing</strong><span><kbd>Back</kbd> removes the latest entry. <kbd>Clear</kbd> clears the current calculation. Invalid dimensions, zero denominators, and division by zero display an error instead of a result.</span></div>
-              </div>
+                </div>
+              </details>
             </section>
 
             <div class="settings-group-label">About</div>
             <section class="settings-card v1-settings-card about-card">
               <h3>About ARCcalc</h3>
-              <div class="settings-static"><span>App version</span><strong>1.5</strong></div>
+              <div class="settings-static"><span>App version</span><strong>1.6</strong></div>
               <div class="settings-static"><span>Shape database</span><strong>AISC v16.0</strong></div>
               <div class="settings-static"><span>Release channel</span><strong>Stable</strong></div>
               <p class="settings-note small">Calculation and reference aid for structural-steel fabrication, fitting, QA, and welding inspection. Verify safety-critical work against approved drawings, procedures, codes, and project requirements.</p>
@@ -7194,6 +7201,17 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     if(quarter===0)return String(whole)+' in';
     return (whole?whole+' ':'')+fractions[quarter]+' in';
   }
+  function formatIpmValue(value){
+    const n=Number(value);
+    if(!Number.isFinite(n))return '';
+    const a=Math.abs(n);
+    if(a===0)return '0';
+    if(a>=1)return trim(Math.round(n*100)/100);
+    if(a>=0.1)return trim(Math.round(n*1000)/1000);
+    if(a>=0.01)return trim(Math.round(n*10000)/10000);
+    if(a>=0.001)return trim(Math.round(n*1000000)/1000000);
+    return String(Number(n.toPrecision(6)));
+  }
   function populateIpmSelects(){
     const minutes=document.getElementById('ipmMinutes');
     const seconds=document.getElementById('ipmSeconds');
@@ -7270,6 +7288,8 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
   function startWeldStopwatch(){
     if(weldStopwatch.running)return;
     setIpmEntryMode('stopwatch',true);
+    lastIpmResult=null;
+    setIpmResult('—','Timing a new weld. Stop the timer, then calculate IPM.',true);
     weldStopwatch.running=true;weldStopwatch.startedAt=Date.now();weldStopwatch.useExactTime=false;
     setStopwatchNote('Timing weld travel. Stop when the measured weld ends.',false);
     if(weldStopwatch.timer)clearInterval(weldStopwatch.timer);
@@ -7296,6 +7316,8 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     weldStopwatch.running=false;weldStopwatch.startedAt=0;weldStopwatch.elapsedMs=0;weldStopwatch.useExactTime=false;
     if(weldStopwatch.timer){clearInterval(weldStopwatch.timer);weldStopwatch.timer=null;}
     if(clearTimeFields!==false){const minutes=document.getElementById('ipmMinutes');const seconds=document.getElementById('ipmSeconds');if(minutes)minutes.value='0';if(seconds)seconds.value='0';}
+    lastIpmResult=null;
+    setIpmResult('—','Enter weld time and length.',true);
     setStopwatchNote('Start when the arc begins; stop at the end of the measured weld.',false);renderWeldStopwatch();
   }
   function setIpmResult(valueText,detailText,warning){
@@ -7318,17 +7340,15 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     if(!Number.isFinite(minutes)||minutes<0||!Number.isFinite(seconds)||seconds<0||seconds>=60||!Number.isFinite(length)||length<=0||!Number.isFinite(totalSeconds)||totalSeconds<=0){
       lastIpmResult=null;
       setIpmResult('Check inputs','Elapsed time must be greater than zero and weld length must be positive.',true);
-      setHeatDisplay('Check inputs','Weld time must be greater than zero.','IPM',true);
       return NaN;
     }
     const ipm=length*60/totalSeconds;
-    const ipmText=trim(Math.round(ipm*100)/100);
+    const ipmText=formatIpmValue(ipm);
     const secondsPerInch=totalSeconds/length;
     const secondsPerInchText=trim(Math.round(secondsPerInch*100)/100);
     const timeText=Number.isFinite(stopwatchSeconds)?stopwatchTimeText(totalSeconds):((minutes?minutes+' min ':'')+seconds+' sec');
     lastIpmResult={ipm:ipm,ipmText:ipmText,minutes:minutes,seconds:seconds,length:length,totalSeconds:totalSeconds,stopwatch:Number.isFinite(stopwatchSeconds)};
     setIpmResult('<span>'+ipmText+'</span><span class="ipm-unit">IPM</span>',ipmFormatLength(length)+' • '+timeText+' • '+secondsPerInchText+' sec/in',false);
-    setHeatDisplay(heatMainHTML(ipmText,'IPM'),ipmFormatLength(length)+' welded in '+timeText,'IPM',false);
     try{localStorage.setItem('arccalc_hr1_ipm',JSON.stringify({minutes:minutes,seconds:seconds,length:length,mode:ipmEntryMode}));}catch(e){}
     return ipm;
   }
@@ -7336,9 +7356,8 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     if(!lastIpmResult||!Number.isFinite(lastIpmResult.ipm)||lastIpmResult.ipm<=0)return;
     const travel=document.getElementById('heatTravel');
     const unit=document.getElementById('heatSpeedUnit');
-    if(travel)travel.value=trim(Math.round(lastIpmResult.ipm*100)/100);
+    if(travel)travel.value=formatIpmValue(lastIpmResult.ipm);
     if(unit)unit.value='ipm';
-    setHeatDisplay(heatMainHTML(lastIpmResult.ipmText,'IPM'),'Copied to Heat Input travel speed.','IPM',false);
     const sub=document.getElementById('ipmResultDetail');
     if(sub)sub.textContent=ipmFormatLength(lastIpmResult.length)+' welded in '+(lastIpmResult.stopwatch?stopwatchTimeText(lastIpmResult.totalSeconds):((lastIpmResult.minutes?lastIpmResult.minutes+' min ':'')+lastIpmResult.seconds+' sec'))+' • copied to Travel speed';
   }
@@ -7652,7 +7671,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     });
   }
 
-  window.ArcCalcHR1={pressNum,pressUnit,pressOp,pressEq,resetAll,state,stairCalc,stairExpectedDebug,stair,showStairResult,cycleStairResult,solveTri,circle,showCircleCycleMode,sqrt,percent,board,parseSettingInches,calculateHeatInput,calculateIpm,useIpmForHeatInput,clearIpm,cycleWeight,lengthKey,altOp,altNum,curValue,curUnit,curIn,convertTo,AISC_SHAPES_V16_0,beamUpdateLookup,beamPopulateDropdowns,openHistory,closeHistory,clearCalculationHistory,restoreCalculationHistory,startWeldStopwatch,stopWeldStopwatch,resetWeldStopwatch,weldStopwatch,setIpmEntryMode,renderHistoryPanel};
+  window.ArcCalcHR1={pressNum,pressUnit,pressOp,pressEq,resetAll,state,stairCalc,stairExpectedDebug,stair,showStairResult,cycleStairResult,solveTri,circle,showCircleCycleMode,sqrt,percent,board,parseSettingInches,calculateHeatInput,calculateIpm,useIpmForHeatInput,clearIpm,formatIpmValue,cycleWeight,lengthKey,altOp,altNum,curValue,curUnit,curIn,convertTo,AISC_SHAPES_V16_0,beamUpdateLookup,beamPopulateDropdowns,openHistory,closeHistory,clearCalculationHistory,restoreCalculationHistory,startWeldStopwatch,stopWeldStopwatch,resetWeldStopwatch,weldStopwatch,setIpmEntryMode,renderHistoryPanel};
   bindPressFeedback();
   renderHistoryPanel();
   loadIpm();
@@ -8620,6 +8639,21 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     .settings-patriot-footer{margin-top:0!important}
 
     .calculator-guide-card{box-shadow:inset 3px 0 0 rgba(78,173,238,.34),0 8px 20px rgba(0,0,0,.13)!important}
+
+    .calculator-guide-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;min-height:48px;padding:2px 0;color:#ddecf8;-webkit-tap-highlight-color:transparent}
+    .calculator-guide-details>summary::-webkit-details-marker{display:none}
+    .calculator-guide-summary-copy{display:grid;gap:4px;min-width:0}
+    .calculator-guide-summary-copy strong{font-size:14px;color:#e8f4fd}
+    .calculator-guide-summary-copy small{font-size:10.5px;line-height:1.35;color:#8fa6ba;font-weight:600}
+    .calculator-guide-details>summary:after{content:'+';display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:9px;border:1px solid rgba(95,190,248,.22);background:#0a1724;color:#73c9f8;font-size:19px;font-weight:500;line-height:1}
+    .calculator-guide-details[open]>summary:after{content:'−'}
+    .calculator-guide-details[open]>summary{padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .calculator-guide-intro{margin-top:10px!important}
+    .calculator-guide-details .calculator-guide-list{margin-top:9px}
+    @media(max-width:520px){
+      .history-trigger{width:44px!important;height:44px!important;min-height:44px!important}
+      .app-tab{min-height:44px!important}
+    }
     .calculator-guide-list{display:grid;gap:0;margin-top:8px;border:1px solid rgba(117,171,211,.13);border-radius:12px;overflow:hidden;background:#07111c}
     .calculator-guide-item{display:grid;gap:5px;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.055)}
     .calculator-guide-item:last-child{border-bottom:0}

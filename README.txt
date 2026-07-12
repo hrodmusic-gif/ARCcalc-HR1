@@ -1,6 +1,6 @@
-ARCcalc HR1 v1.5
+ARCcalc HR1 v1.6
 
 Upload every file in this folder to the root of the GitHub Pages repository.
-The package includes the application, manifest, service worker, icons, and branding assets.
+The package includes the application, manifest, service worker, and production app icons.
 
-See MAINTENANCE_NOTES.md for v1.5 changes.
+See MAINTENANCE_NOTES.md for v1.6 changes.

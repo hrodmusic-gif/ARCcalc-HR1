@@ -1,17 +1,18 @@
-# ARCcalc HR1 v1.5
+# ARCcalc HR1 v1.6
 
-## Weld tab cleanup
+## Stability repairs
 
-- Added a Manual / Stopwatch switch so only one timing method appears at a time.
-- Compacted the stopwatch into a single readout row with contextual Start/Stop and Reset controls.
-- Kept weld length visible for both timing modes.
-- Moved Use in Heat Input into the IPM result card.
-- Replaced the large Clear action with a small reset control in the Travel Speed heading.
-- Shortened helper text and kept the travel-speed formula collapsed by default.
+- Preserves sufficient decimal precision for valid very-low travel-speed results instead of rounding them to zero.
+- Transfers the same nonzero precision into Heat Input.
+- Clears and disables an old IPM result whenever a new stopwatch timing run begins or the stopwatch is reset.
+- Keeps IPM calculations inside the Travel Speed result panel so they no longer replace the Heat Input Result screen.
 
-## Calculation engine
+## Settings and accessibility
 
-- Existing heat-input and IPM formulas are unchanged.
-- Exact stopwatch tenths remain available in Stopwatch mode.
-- Manual mode always uses the selected minutes and seconds.
-- Existing calculator, stair, weight, shape, history, and unit-conversion behavior is unchanged.
+- Calculator Guide is collapsed by default and opens only when requested.
+- Increased the calculation-history and bottom-tab touch targets to at least 44 CSS pixels on phones.
+
+## Package cleanup
+
+- Removed four unused source/overlay images from the production PWA package.
+- Existing calculator, stair, weight, shape, history, unit-conversion, heat-input, and IPM formulas remain unchanged except for IPM display/transfer precision.
