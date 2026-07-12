@@ -1,4 +1,4 @@
-const CACHE_NAME = "arccalc-hr1-v5-15-logo-clearance";
+const CACHE_NAME = "arccalc-hr1-v5-16-beta";
 const APP_SHELL = [
   "./",
   "./index.html",

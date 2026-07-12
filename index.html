@@ -4900,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.15 Logo Clearance -->
+  <!-- ARCcalc HR1 v5.16 Beta -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5441,7 +5441,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>v5.15 <span class="version-pill">logo clearance</span></strong>
+                <strong>v5.16 Beta</strong>
               </div>
             </section>
 
@@ -7813,6 +7813,24 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       html.arc-installed.arc-ios .brand-logo{
         height:82px!important;
         max-height:82px!important;
+      }
+    }
+  </style>
+
+
+  <style id="arccalc-remove-top-divider-v516">
+    /* ARCcalc HR1 v5.16 Beta — remove the artificial top case highlight.
+       In edge-to-edge iPhone Home Screen mode the calculator already fills the
+       viewport, so the legacy inset frame shadow appeared as a divider directly
+       below the status bar. Keep only a subtle bottom inset and no top outline. */
+    @media(max-width:520px) and (orientation:portrait){
+      .calculator{
+        border-top:0!important;
+        outline:0!important;
+        box-shadow:inset 0 -1px 0 rgba(0,0,0,.22)!important;
+      }
+      .calculator:before{
+        display:none!important;
       }
     }
   </style>

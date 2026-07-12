@@ -1,5 +1,5 @@
 ARCcalc HR1
-v5.6 Portrait Fill PWA
+v5.16 Beta PWA
 
 Open index.html in a browser for a local preview. For installable/offline PWA behavior, serve this folder over HTTPS or localhost.
 
@@ -95,3 +95,9 @@ v5.6 DISPLAY NOTE
 - Fixed the logo wrapper at 82px on tall installed iPhones to prevent internal clipping.
 - Allows the brand and logo wrapper to overflow visibly while keeping the app viewport clipped.
 - Preserves the approved bottom navigation, key sizing, full-screen layout, and unified top color.
+
+
+## v5.16 Beta
+- Removed the legacy top frame highlight that appeared as a divider below the iPhone status bar.
+- Settings now shows only “v5.16 Beta” under App version.
+- Logo placement, stretched keypad, and approved bottom bar remain unchanged.

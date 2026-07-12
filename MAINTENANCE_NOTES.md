@@ -103,3 +103,10 @@ Safari and Chrome do not guarantee orientation locking for a normal browser tab.
 - Fixed the logo wrapper at 82px on tall installed iPhones to prevent internal clipping.
 - Allows the brand and logo wrapper to overflow visibly while keeping the app viewport clipped.
 - Preserves the approved bottom navigation, key sizing, full-screen layout, and unified top color.
+
+
+## v5.16 Beta
+- Removed the mobile calculator top inset/frame shadow that created a horizontal divider below the iPhone status bar.
+- Retained a subtle bottom inset only; no geometry or control sizing changed.
+- Simplified the Settings version label to `v5.16 Beta`.
+- Bumped the offline cache to `arccalc-hr1-v5-16-beta`.
