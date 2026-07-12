@@ -4900,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.13 Unified Top -->
+  <!-- ARCcalc HR1 v5.14 Dynamic Island Fit -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5441,7 +5441,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>v5.13 <span class="version-pill">unified top</span></strong>
+                <strong>v5.14 <span class="version-pill">dynamic island fit</span></strong>
               </div>
             </section>
 
@@ -7790,7 +7790,23 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     }
   </style>
 
-  <script id="arccalc-responsive-runtime-v513">
+  <style id="arccalc-dynamic-island-fit-v514">
+    /* ARCcalc HR1 v5.14 — lift the brand into the modern iPhone top safe area.
+       On Dynamic Island iPhones the safe-area inset is taller than the island
+       itself. v5.13 respected the full inset, leaving the logo lower than the
+       user wanted. This subtracts a conservative 20px only for installed iOS
+       apps on modern tall portrait displays. The logo remains below the island,
+       while the recovered height is automatically returned to the keypad. */
+    :root{--arc-island-brand-lift:20px}
+
+    @media(max-width:520px) and (orientation:portrait) and (min-height:830px){
+      html.arc-installed.arc-ios .brand{
+        padding-top:max(4px, calc(var(--arc-ui-top) - var(--arc-island-brand-lift)))!important;
+      }
+    }
+  </style>
+
+  <script id="arccalc-responsive-runtime-v514">
   (()=>{
     const root=document.documentElement;
     const body=document.body;

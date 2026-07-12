@@ -81,3 +81,10 @@ v5.6 DISPLAY NOTE
 - Replaced the diagonal phone background at the top edge with a vertically blended surface whose first color is uniform across the full width.
 - Removed the one-pixel calculator case outline at the installed-app top edge.
 - Preserved the approved v5.12 bottom navigation dimensions and full-height keypad.
+
+
+## v5.14 Dynamic Island fit
+- Moved the brand/header 20 CSS pixels upward on installed modern iPhones.
+- Keeps a conservative gap below the Dynamic Island rather than using the entire safe-area inset as empty spacing.
+- Returns the recovered height to the keypad automatically.
+- Preserves the approved v5.12/v5.13 bottom navigation dimensions and unified top color.
