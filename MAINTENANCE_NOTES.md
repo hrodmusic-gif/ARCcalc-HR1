@@ -1,13 +1,17 @@
-# ARCcalc HR1 v1.3
+# ARCcalc HR1 v1.5
 
-## UI refinements
+## Weld tab cleanup
 
-- Removed the Quick Time and Quick Length preset rows from the Weld tab.
-- Retained the minute, second, and weld-length dropdowns plus IPM calculation and Heat Input handoff.
-- Replaced the detailed outline settings icon with a cleaner solid gear.
-- Expanded the Calculator Guide with exact button order, field examples, unit rules, alternate functions, and error behavior.
-- Settings reports App version 1.3 and Stable release channel.
+- Added a Manual / Stopwatch switch so only one timing method appears at a time.
+- Compacted the stopwatch into a single readout row with contextual Start/Stop and Reset controls.
+- Kept weld length visible for both timing modes.
+- Moved Use in Heat Input into the IPM result card.
+- Replaced the large Clear action with a small reset control in the Travel Speed heading.
+- Shortened helper text and kept the travel-speed formula collapsed by default.
 
 ## Calculation engine
 
-No formulas, shape data, stair behavior, welding calculations, or unit-conversion logic were changed in this release.
+- Existing heat-input and IPM formulas are unchanged.
+- Exact stopwatch tenths remain available in Stopwatch mode.
+- Manual mode always uses the selected minutes and seconds.
+- Existing calculator, stair, weight, shape, history, and unit-conversion behavior is unchanged.
