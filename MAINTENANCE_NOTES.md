@@ -1,8 +1,31 @@
-# ARCcalc HR1 5.18 Beta
+# ARCcalc HR1 5.21 Beta
 
-- Removed the persistent one-pixel iPhone status-area divider with a dedicated safe-area seam mask.
-- Settings now shows only `5.17 Beta` under App version.
-- Keypad, logo placement, and approved bottom navigation remain unchanged.
+## 5.21 Beta — Weld layout order
+
+- Welding Parameters is now the first card in the Weld tab.
+- Travel Speed (IPM) is directly below it.
+- Heat-input and IPM formulas are unchanged.
+
+
+- Added a Weld-tab travel-speed calculator for inches per minute (IPM).
+- Uses native dropdowns for elapsed minutes, elapsed seconds, and completed weld length.
+- Length choices use 1/4-inch steps through 120 inches and whole-inch steps through 240 inches.
+- Formula: `IPM = weld length in inches × 60 ÷ elapsed seconds`.
+- Added a one-tap “Use for Heat Input” action that copies the calculated IPM into the existing travel-speed field.
+- Added validation for zero elapsed time and invalid weld lengths.
+- Settings shows only `5.20 Beta` under App version.
+- CM5 stair behavior, math-integrity fixes, approved iPhone layout, logo, and bottom navigation are unchanged.
+
+# ARCcalc HR1 5.19 Beta
+
+- Verified the stair engine against a physical Construction Master 5 using four reference cases.
+- CM5 behavior: nearest whole riser/tread count with exact .5 ties upward, nearest 1/16-inch displayed dimensions, rounded-dimension over/under, tread-count step diagonals for stringer, and rounded-dimension incline angle.
+- Rejected impossible right triangles and non-positive circle diameters.
+- Added dimensional handling for square, square root, percent, area conversion, and length/length division.
+- Hardened Settings fractions, stair shortcut validation, and weld efficiency.
+- Repaired the board-foot multi-entry state flow.
+- Settings shows only `5.19 Beta` under App version.
+- Keypad, logo placement, iPhone separator compensation, and approved bottom navigation are unchanged.
 
 # ARCcalc HR1 v5.6 Maintenance Notes
 

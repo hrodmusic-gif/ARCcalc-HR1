@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 5.18 Beta steel fabrication calculator with iOS Home Screen separator compensation.",
+  "description": "ARCcalc HR1 5.21 Beta steel fabrication calculator with CM5-matched stairs, math-integrity repairs, and welding parameters placed above the travel-speed IPM calculator.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

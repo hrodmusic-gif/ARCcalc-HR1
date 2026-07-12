@@ -4900,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.18 Beta -->
+  <!-- ARCcalc HR1 v5.21 Beta -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5343,6 +5343,35 @@ body:after{
     }
   </style>
 
+
+  <style id="arccalc-ipm-v520">
+    .ipm-card{position:relative;overflow:hidden;flex:0 0 auto!important}
+    .ipm-card::before{
+      content:"";position:absolute;inset:0 0 auto 0;height:3px;
+      background:linear-gradient(90deg,#0e76ff,#31d6ff);opacity:.9;
+    }
+    .ipm-time-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .ipm-length-field{margin-top:10px}
+    .ipm-result-panel{
+      margin-top:12px;padding:12px 14px;border:1px solid rgba(111,190,255,.24);
+      border-radius:14px;background:linear-gradient(180deg,rgba(18,31,48,.88),rgba(9,18,30,.92));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+    }
+    .ipm-result-value{font-size:clamp(27px,7vw,38px);font-weight:850;line-height:1;letter-spacing:-.025em;color:#f3f8ff}
+    .ipm-result-value .ipm-unit{font-size:.47em;margin-left:6px;letter-spacing:.05em;color:#63c9ff}
+    .ipm-result-detail{margin-top:7px;font-size:12px;line-height:1.35;color:#aebed0}
+    .ipm-formula{margin-top:8px;font-size:11px;color:#7f93aa}
+    .ipm-card .settings-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    .ipm-card [data-ipm-action="calculate"]{grid-column:1/-1}
+    .ipm-card .settings-action{font-size:12px!important;padding-inline:8px!important}
+    .ipm-card .settings-action[disabled]{opacity:.42;cursor:not-allowed;filter:saturate(.5)}
+    @media (max-width:390px){
+      .ipm-time-grid{gap:7px}
+      .ipm-result-panel{padding:10px 12px}
+      .ipm-result-value{font-size:28px}
+    }
+  </style>
+
 </head>
 <body>
 <main class="wrap">
@@ -5441,7 +5470,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>5.18 Beta</strong>
+                <strong>5.21 Beta</strong>
               </div>
             </section>
 
@@ -5558,13 +5587,48 @@ body:after{
 
               <label class="settings-field">
                 <span>Efficiency factor</span>
-                <input id="heatEfficiency" inputmode="decimal" autocomplete="off" placeholder="0.80">
+                <input id="heatEfficiency" inputmode="decimal" autocomplete="off" placeholder="0.80" min="0.01" max="1" step="0.01">
                 <small>Defaults are process-based. Override when your procedure or code requires a different factor.</small>
               </label>
 
               <div class="settings-row">
                 <button class="settings-action primary" type="button" data-heat-action="calculate">Calculate</button>
                 <button class="settings-action" type="button" data-heat-action="clear">Clear</button>
+              </div>
+            </section>
+
+
+            <section class="settings-card priority-card ipm-card">
+              <h3>Travel Speed (IPM)</h3>
+              <p class="settings-note">Select the elapsed weld time and the completed weld length. ARCcalc calculates inches per minute for use in heat-input calculations.</p>
+
+              <div class="ipm-time-grid">
+                <label class="settings-field">
+                  <span>Minutes</span>
+                  <select id="ipmMinutes" aria-label="Elapsed weld minutes"></select>
+                </label>
+                <label class="settings-field">
+                  <span>Seconds</span>
+                  <select id="ipmSeconds" aria-label="Elapsed weld seconds"></select>
+                </label>
+              </div>
+
+              <label class="settings-field ipm-length-field">
+                <span>Weld length</span>
+                <select id="ipmLength" aria-label="Completed weld length in inches"></select>
+                <small>Lengths are available in 1/4-inch steps through 120 in, then whole-inch steps through 240 in.</small>
+              </label>
+
+              <div class="settings-row">
+                <button class="settings-action primary" type="button" data-ipm-action="calculate">Calculate IPM</button>
+                <button class="settings-action" type="button" data-ipm-action="use" id="ipmUseButton" disabled>Use in Heat Input</button>
+                <button class="settings-action" type="button" data-ipm-action="clear">Clear</button>
+              </div>
+
+              <div class="ipm-result-panel" aria-live="polite">
+                <div class="ipm-result-value" id="ipmResultValue">—</div>
+                <div class="ipm-result-detail" id="ipmResultDetail">Select a weld time and length, then press Calculate IPM.</div>
+                <div class="ipm-formula">IPM = weld length in inches × 60 ÷ elapsed seconds</div>
               </div>
             </section>
 
@@ -5592,6 +5656,11 @@ body:after{
               <details>
                 <summary>Which process should I choose?</summary>
                 <p>Choose the process group that matches the welding process being used. Choose Custom if the procedure, code, project specification, or engineering requirement specifies a different efficiency factor.</p>
+              </details>
+              <details>
+                <summary>Measuring travel speed in IPM</summary>
+                <p>Time a completed weld, select the elapsed minutes and seconds, then select the welded length in inches. ARCcalc divides the length by the elapsed time in minutes.</p>
+                <p>Example: 6 inches welded in 30 seconds equals <strong>12 IPM</strong>. Press <strong>Use for Heat Input</strong> to copy the result into Travel speed.</p>
               </details>
               <details>
                 <summary>Reading the output</summary>
@@ -5736,15 +5805,26 @@ body:after{
   function singleUnitHTML(value,u){if(u==='in')return singleInchHTML(value);const text=formatUnitValue(value,u);let cls='single-unit-readout';if(u==='yd')cls+=' yard-readout';return '<div class="'+cls+'"><div class="single-unit-value">'+text+'</div><div class="single-unit-label">'+unitLabel(u)+'</div></div>';}
   function compIn(){const c=state.comp;let ft=c.feet,inch=c.inches,n=c.num,d=c.den,x=val(state.entry);if(c.active&&state.typing){if(c.stage==='feet')ft=x;if(c.stage==='inches')inch=x;if(c.stage==='num')n=x;if(c.stage==='den')d=x;}let total=ft*12+inch;const denominatorWasEntered=c.den!==null||(c.active&&c.stage==='den'&&state.typing);if(n!==null&&denominatorWasEntered&&d===0)return NaN;if(n!==null&&d!==null&&d!==0)total+=n/d;return total;}
   function isLengthUnit(u){return !!(u&&UNIT[u]&&UNIT[u].kind==='length');}
-  function isAreaUnit(u){return u==='sqft'||u==='sqin';}
-  function areaToSqIn(v,u){return u==='sqft'?v*144:v;}
-  function areaFromSqIn(v,u){return u==='sqft'?v/144:v;}
-  function areaLabel(u){return u==='sqin'?'SQ INCH':'SQ FEET';}
-  function unitStatusLabel(u){return u&&UNIT[u]?UNIT[u].label:(u?String(u).toUpperCase():'DECIMAL');}
+  const AREA_UNITS={
+    sqin:{label:'SQ INCH',suffix:'sq in',toSqIn:1,root:'in'},
+    sqft:{label:'SQ FEET',suffix:'sq ft',toSqIn:144,root:'ft'},
+    sqyd:{label:'SQ YARDS',suffix:'sq yd',toSqIn:1296,root:'yd'},
+    sqm:{label:'SQ METERS',suffix:'sq m',toSqIn:1550.0031000062,root:'m'},
+    sqcm:{label:'SQ CENTIMETERS',suffix:'sq cm',toSqIn:0.15500031000062,root:'cm'},
+    sqmm:{label:'SQ MILLIMETERS',suffix:'sq mm',toSqIn:0.0015500031000062,root:'mm'}
+  };
+  const LENGTH_TO_AREA={in:'sqin',ft:'sqft',yd:'sqyd',m:'sqm',cm:'sqcm',mm:'sqmm'};
+  function isAreaUnit(u){return !!AREA_UNITS[u];}
+  function areaToSqIn(v,u){return isAreaUnit(u)?v*AREA_UNITS[u].toSqIn:NaN;}
+  function areaFromSqIn(v,u){return isAreaUnit(u)?v/AREA_UNITS[u].toSqIn:NaN;}
+  function areaLabel(u){return isAreaUnit(u)?AREA_UNITS[u].label:'AREA';}
+  function areaUnitForLength(u){return LENGTH_TO_AREA[u]||null;}
+  function lengthUnitForArea(u){return isAreaUnit(u)?AREA_UNITS[u].root:null;}
+  function unitStatusLabel(u){return u&&UNIT[u]?UNIT[u].label:(isAreaUnit(u)?areaLabel(u):(u?String(u).toUpperCase():'DECIMAL'));}
   function curUnit(){return state.error?null:(state.comp.active?'ft':state.unit);}
   function curValue(){if(state.error)return NaN;return state.comp.active?compIn()/12:val(state.entry);}
   function curIn(){if(state.error)return NaN;if(state.comp.active)return compIn();const u=state.unit||'in';return isLengthUnit(u)?val(state.entry)*UNIT[u].toIn:NaN;}
-  function disp(v,u,weightIndex){if(arguments.length===0){if(state.error)return'Error';if(state.comp.active)return fmtIn(compIn());return disp(curValue(),curUnit(),state.weight&&state.weight.unitIndex);}if(!Number.isFinite(v))return'Error';if(u==='ft')return fmtIn(v*12);if(u==='in')return fmtInchesOnly(v);if(u==='m')return formatUnitValue(v,u)+' meter';if(u==='cm')return formatUnitValue(v,u)+' centimeter';if(u==='mm')return formatUnitValue(v,u)+' millimeter';if(u==='sqft')return trim(Math.round(v*1000)/1000)+' sq ft';if(u==='sqin')return trim(Math.round(v*1000)/1000)+' sq in';if(u==='weight'){const wu=WEIGHT_UNITS[((weightIndex==null?(state.weight&&state.weight.unitIndex):weightIndex)||0)];return formatWeightValue(v)+' '+(wu?wu.short:'weight');}if(u)return trim(v)+' '+u;return trim(v);}
+  function disp(v,u,weightIndex){if(arguments.length===0){if(state.error)return'Error';if(state.comp.active)return fmtIn(compIn());return disp(curValue(),curUnit(),state.weight&&state.weight.unitIndex);}if(!Number.isFinite(v))return'Error';if(u==='ft')return fmtIn(v*12);if(u==='in')return fmtInchesOnly(v);if(u==='m')return formatUnitValue(v,u)+' meter';if(u==='cm')return formatUnitValue(v,u)+' centimeter';if(u==='mm')return formatUnitValue(v,u)+' millimeter';if(isAreaUnit(u))return trim(Math.round(v*1000)/1000)+' '+AREA_UNITS[u].suffix;if(u==='weight'){const wu=WEIGHT_UNITS[((weightIndex==null?(state.weight&&state.weight.unitIndex):weightIndex)||0)];return formatWeightValue(v)+' '+(wu?wu.short:'weight');}if(u)return trim(v)+' '+u;return trim(v);}
   function opText(op){return({'+':'+','-':'-','*':'x','/':'÷'})[op]||op;}
   function deg(n){return (Math.round(n*100)/100).toFixed(2);}
   function angle(){if(state.tri.pitch!=null)return deg(Math.atan(state.tri.pitch/12)*180/Math.PI);if(state.tri.rise!=null&&state.tri.run)return deg(Math.atan(state.tri.rise/state.tri.run)*180/Math.PI);return'-';}
@@ -5928,7 +6008,11 @@ body:after{
         const ri=op==='+'?toIn(a,au)+toIn(b,bu):toIn(a,au)-toIn(b,bu);
         r=ri/12;ru='ft';
       }else if(aLength&&bLength&&op==='*'){
-        r=(toIn(a,au)*toIn(b,bu))/144;ru='sqft';
+        const outArea=areaUnitForLength(au)||'sqft';
+        const rightInLeftUnits=toIn(b,bu)/UNIT[au].toIn;
+        r=a*rightInLeftUnits;ru=outArea;
+      }else if(aLength&&bLength&&op==='/'){
+        r=toIn(a,au)/toIn(b,bu);ru=null;
       }else if(aLength&&!bu&&(op==='*'||op==='/')){
         r=op==='*'?a*b:a/b;ru=au;
       }else if(!au&&bLength&&op==='*'){
@@ -5962,7 +6046,7 @@ body:after{
         setAns(WEIGHT_UNITS[idx].label,out.value,'weight',line);
         return;
       }
-      setAns(isAreaUnit(out.unit)?(out.unit==='sqin'?'SQ INCH':'AREA'):'ANSWER',out.value,out.unit,line);
+      setAns(isAreaUnit(out.unit)?(out.unit==='sqft'?'AREA':areaLabel(out.unit)):'ANSWER',out.value,out.unit,line);
     };
 
     if(!state.pending){
@@ -6067,10 +6151,48 @@ body:after{
     state.msg=state.conv?'Alternate functions active.':'Ready';
     render();
   }
-  function convertTo(u){const inches=curIn(),v=inches/UNIT[u].toIn;state.conv=false;setAns('CONVERT',v,u,trim(inches)+' total inches');addTape('Convert = '+disp(v,u));}
+  function convertTo(u){
+    if(isAreaUnit(curUnit())){
+      const target=areaUnitForLength(u);
+      if(!target)return setError('Unsupported area conversion.');
+      const sqIn=areaToSqIn(curValue(),curUnit());
+      const v=areaFromSqIn(sqIn,target);
+      state.conv=false;
+      setAns(areaLabel(target),v,target,'Area converted');
+      addTape('Convert = '+disp(v,target));
+      return;
+    }
+    const inches=curIn(),v=inches/UNIT[u].toIn;
+    state.conv=false;setAns('CONVERT',v,u,trim(inches)+' total inches');addTape('Convert = '+disp(v,u));
+  }
   function altOp(op){state.conv=false;const v=curValue();if(op==='*')return v===0?setError('Cannot take the reciprocal of zero.'):setAns('1/X',1/v,null,'Reciprocal');if(op==='-')return setAns('+/-',-v,curUnit(),'Sign changed');if(op==='+')return setAns('PI',Math.PI,null,'Pi');if(op==='/')return pressOp('/');}
-  function altNum(n){state.conv=false;if(n==='6')return resetAll();if(n==='5'){state.jack.spacing=curValue();return setAns('O.C.',state.jack.spacing,'in','Jack spacing stored');}if(n==='7'){state.stair.riser=curIn();state.stair.resultIndex=10;state.stair.changed=true;setAns('DESIRED RISER HEIGHT',state.stair.riser,'in','Desired riser height stored');addTape('Desired riser height = '+fmtInchesOnly(state.stair.riser));return;}if(n==='9'){state.stair.tread=curIn();state.stair.resultIndex=11;state.stair.changed=true;setAns('DESIRED TREAD WIDTH',state.stair.tread,'in','Desired tread width stored');addTape('Desired tread width = '+fmtInchesOnly(state.stair.tread));return;}if(n==='0'){state.density=curValue();return setAns('DENSITY',state.density,null,'Density stored');}pressNum(n);}
-  function solveTri(){const t=state.tri;if(t.pitch!=null&&t.run!=null&&t.rise==null)t.rise=t.run*t.pitch/12;if(t.pitch!=null&&t.rise!=null&&t.run==null&&t.pitch!==0)t.run=t.rise*12/t.pitch;if(t.diag!=null&&t.run!=null&&t.rise==null)t.rise=Math.sqrt(Math.max(0,t.diag*t.diag-t.run*t.run));if(t.diag!=null&&t.rise!=null&&t.run==null)t.run=Math.sqrt(Math.max(0,t.diag*t.diag-t.rise*t.rise));if(t.pitch!=null&&t.diag!=null&&t.run==null){t.run=t.diag/Math.sqrt(1+Math.pow(t.pitch/12,2));t.rise=t.run*t.pitch/12;}if(t.rise!=null&&t.run!=null){t.diag=Math.hypot(t.rise,t.run);t.pitch=t.run?t.rise/t.run*12:null;}}
+  function altNum(n){state.conv=false;if(n==='6')return resetAll();if(n==='5'){state.jack.spacing=curValue();return setAns('O.C.',state.jack.spacing,'in','Jack spacing stored');}if(n==='7'){const v=curIn();if(!Number.isFinite(v)||v<=0)return setError('Desired riser height must be greater than zero.');state.stair.riser=v;state.stair.resultIndex=0;state.stair.changed=true;setAns('DESIRED RISER HEIGHT',state.stair.riser,'in','Desired riser height stored');addTape('Desired riser height = '+fmtInchesOnly(state.stair.riser));return;}if(n==='9'){const v=curIn();if(!Number.isFinite(v)||v<=0)return setError('Desired tread width must be greater than zero.');state.stair.tread=v;state.stair.resultIndex=0;state.stair.changed=true;setAns('DESIRED TREAD WIDTH',state.stair.tread,'in','Desired tread width stored');addTape('Desired tread width = '+fmtInchesOnly(state.stair.tread));return;}if(n==='0'){state.density=curValue();return setAns('DENSITY',state.density,null,'Density stored');}pressNum(n);}
+  function solveTri(){
+    const t=state.tri;
+    const eps=1e-9;
+    if(t.diag!=null&&t.diag<=0){setError('Diagonal must be greater than zero.');return false;}
+    if(t.run!=null&&t.run<0){setError('Run cannot be negative.');return false;}
+    if(t.rise!=null&&t.rise<0){setError('Rise cannot be negative.');return false;}
+    if(t.pitch!=null&&t.run!=null&&t.rise==null)t.rise=t.run*t.pitch/12;
+    if(t.pitch!=null&&t.rise!=null&&t.run==null&&t.pitch!==0)t.run=t.rise*12/t.pitch;
+    if(t.diag!=null&&t.run!=null&&t.rise==null){
+      if(Math.abs(t.run)>t.diag+eps){setError('Diagonal must be at least as long as the run.');return false;}
+      t.rise=Math.sqrt(Math.max(0,t.diag*t.diag-t.run*t.run));
+    }
+    if(t.diag!=null&&t.rise!=null&&t.run==null){
+      if(Math.abs(t.rise)>t.diag+eps){setError('Diagonal must be at least as long as the rise.');return false;}
+      t.run=Math.sqrt(Math.max(0,t.diag*t.diag-t.rise*t.rise));
+    }
+    if(t.pitch!=null&&t.diag!=null&&t.run==null){
+      t.run=t.diag/Math.sqrt(1+Math.pow(t.pitch/12,2));
+      t.rise=t.run*t.pitch/12;
+    }
+    if(t.rise!=null&&t.run!=null){
+      t.diag=Math.hypot(t.rise,t.run);
+      t.pitch=t.run?t.rise/t.run*12:null;
+    }
+    return true;
+  }
   function triLine(){const t=state.tri,p=[];if(t.pitch!=null)p.push('Pitch '+fmtPitch(t.pitch));if(t.run!=null)p.push('Run '+fmtIn(t.run));if(t.rise!=null)p.push('Rise '+fmtIn(t.rise));if(t.diag!=null)p.push('Diag '+fmtIn(t.diag));return p.join(' | ');}
   
   function showPitchCycleMode(mode){
@@ -6085,6 +6207,7 @@ body:after{
   }
   function showCircleCycleMode(mode){
     if(state.circle.diameter==null)return setMsg('No circle measurement stored.');
+    if(!Number.isFinite(state.circle.diameter)||state.circle.diameter<=0)return setError('Circle diameter must be greater than zero.');
     state.circle.mode=((mode%4)+4)%4;
     state.cycleIndex.circle=state.circle.mode;
     const d=state.circle.diameter;
@@ -6309,7 +6432,7 @@ body:after{
       state.lastCycle='pitch';
       state.typing=false;
       state.comp=blankComp();
-      solveTri();
+      if(!solveTri())return;
       const info=pitchModeInfo(state.tri.pitch);
       setAns(info.label,info.value,info.unit,info.msg);
       state.displayText=info.display;state.lastCycle='pitch';render();
@@ -6317,7 +6440,7 @@ body:after{
       return;
     }
 
-    solveTri();
+    if(!solveTri())return;
     if(state.tri.pitch==null)return setMsg('Enter pitch, then press Pitch.');
 
     const info=pitchModeInfo(state.tri.pitch);
@@ -6333,6 +6456,7 @@ body:after{
     if(shouldUseCurrentForTool(usedPending)){
       const typedLength=fmtIn(curIn());
       const inches=curIn();
+      if(!Number.isFinite(inches)||inches<=0)return setError(l+' must be greater than zero.');
 
       state.tri[k]=inches;
       state.tri[k+'Text']=typedLength;
@@ -6352,6 +6476,7 @@ body:after{
         state.typing=false;
         state.comp=blankComp();
         state.unit=null;
+        if(!solveTri())return;
         setFt('STORED RUN',inches,(state.stair.total!=null?'Rise + Run Stair mode. Press Stair to view stair layout.':'Run-only Stair mode. Press Stair to view stair layout.'));
         state.lastCycle='stairReady';
         addTape('Stair Run = '+typedLength);
@@ -6361,7 +6486,7 @@ body:after{
       state.typing=false;
       state.comp=blankComp();
 
-      solveTri();
+      if(!solveTri())return;
 
       if(state.tri.rise!=null&&!state.tri.riseText)state.tri.riseText=fmtIn(state.tri.rise);
       if(state.tri.run!=null&&!state.tri.runText)state.tri.runText=fmtIn(state.tri.run);
@@ -6373,7 +6498,7 @@ body:after{
       return;
     }
 
-    solveTri();
+    if(!solveTri())return;
 
     if(state.tri.rise!=null&&!state.tri.riseText)state.tri.riseText=fmtIn(state.tri.rise);
     if(state.tri.run!=null&&!state.tri.runText)state.tri.runText=fmtIn(state.tri.run);
@@ -6400,55 +6525,79 @@ body:after{
     setFt(l,state.tri[k],triLine());
     state.lastCycle='stairReady';
   }
-  function hipVal(){if(state.conv){state.conv=false;const p=state.tri.pitch==null?curValue():state.tri.pitch;return setAns('IR PITCH',p/Math.SQRT2,null,'Irregular pitch approx');}solveTri();const run=state.tri.run==null?curIn():state.tri.run,p=state.tri.pitch||0,rise=state.tri.rise==null?run*p/12:state.tri.rise,hip=Math.hypot(Math.hypot(run,run),rise);setFt('HIP/V',hip,'Hip/valley rafter');addTape('Hip/V = '+fmtIn(hip));}
+  function hipVal(){if(state.conv){state.conv=false;const p=state.tri.pitch==null?curValue():state.tri.pitch;return setAns('IR PITCH',p/Math.SQRT2,null,'Irregular pitch approx');}if(!solveTri())return;const run=state.tri.run==null?curIn():state.tri.run,p=state.tri.pitch||0,rise=state.tri.rise==null?run*p/12:state.tri.rise,hip=Math.hypot(Math.hypot(run,run),rise);setFt('HIP/V',hip,'Hip/valley rafter');addTape('Hip/V = '+fmtIn(hip));}
   function roofWall(){if(state.typing||state.comp.active)state.roofSpan=curIn();const span=state.roofSpan==null?curIn():state.roofSpan,half=span/2,p=state.tri.pitch||0,rise=half*p/12,raf=Math.hypot(half,rise);setFt('R/WALL',raf,'Half span '+fmtIn(half)+' | Rise '+fmtIn(rise));addTape('R/Wall = '+fmtIn(raf));}
   function jack(){if(state.conv){state.conv=false;state.jack.side=state.jack.side==='R'?'L':'R';return setMsg('Jack side '+state.jack.side);}const p=state.tri.pitch||0,sp=state.jack.spacing||16,diff=Math.hypot(sp,sp*p/12);setFt('JACK',diff,state.jack.side+' jack difference per '+trim(sp)+' in o.c.');addTape('Jack diff = '+fmtIn(diff));}
-  function board(){if(state.board.step===0){state.board.t=curValue();state.board.step=1;return setMsg('Bd Ft: thickness stored '+trim(state.board.t)+' in');}if(state.board.step===1){state.board.w=curValue();state.board.step=2;return setMsg('Bd Ft: width stored '+trim(state.board.w)+' in');}const len=curUnit()==='ft'?curValue():curIn()/12,bd=state.board.t*state.board.w*len/12;state.board={step:0,t:null,w:null};setAns('BD FT',bd,null,'Board feet');addTape('Board feet = '+trim(bd));}
+  function clearBoardEntry(){state.entry='0';state.typing=false;state.unit=null;state.comp=blankComp();state.pending=null;state.repeat=null;state.displayText=null;}
+  function board(){
+    if(state.board.step===0){
+      const thickness=curUnit()&&curUnit()!=='in'?curIn():curValue();
+      if(!Number.isFinite(thickness)||thickness<=0)return setError('Board thickness must be greater than zero.');
+      state.board.t=thickness;state.board.step=1;clearBoardEntry();
+      return setMsg('Bd Ft: thickness stored '+trim(state.board.t)+' in');
+    }
+    if(state.board.step===1){
+      const width=curUnit()&&curUnit()!=='in'?curIn():curValue();
+      if(!Number.isFinite(width)||width<=0)return setError('Board width must be greater than zero.');
+      state.board.w=width;state.board.step=2;clearBoardEntry();
+      return setMsg('Bd Ft: width stored '+trim(state.board.w)+' in');
+    }
+    const len=curUnit()==='ft'?curValue():curIn()/12;
+    if(!Number.isFinite(len)||len<=0)return setError('Board length must be greater than zero.');
+    const bd=state.board.t*state.board.w*len/12;
+    state.board={step:0,t:null,w:null};
+    setAns('BD FT',bd,null,'Board feet');addTape('Board feet = '+trim(bd));
+  }
 
   function stairRise(){
     if(state.stair&&state.stair.total!=null)return state.stair.total;
     if(state.tri&&state.tri.rise!=null)return state.tri.rise;
     return null;
   }
+  function cm5RoundCount(value){return Math.floor(value+0.5+1e-12);}
+  function cm5RoundSixteenth(value){return Math.floor(value*16+0.5+1e-10)/16;}
   function stairCalc(){
     const desiredRiser=Number(state.stair.riser)||7.5;
     const desiredTread=Number(state.stair.tread)||10;
 
-    const hasRise=stairRise()!=null&&Number.isFinite(stairRise());
+    const riseValue=stairRise();
+    const hasRise=riseValue!=null&&Number.isFinite(riseValue);
     const hasRun=state.stair&&state.stair.run!=null&&Number.isFinite(state.stair.run);
     if(!hasRise&&!hasRun)return null;
+    if(!Number.isFinite(desiredRiser)||desiredRiser<=0||!Number.isFinite(desiredTread)||desiredTread<=0)return null;
+    if(hasRise&&riseValue<=0)return null;
+    if(hasRun&&state.stair.run<=0)return null;
 
     let rise,run,risers,treads,actualRiser,actualTread,rawTread,runOnly=false;
 
     if(hasRise){
-      rise=stairRise();
+      rise=riseValue;
 
-      // reference behavior from uploaded test sheet:
-      // Rise determines number of risers by nearest desired riser height.
-      risers=Math.max(1,Math.round(rise/desiredRiser));
-      actualRiser=Math.round((rise/risers)*16)/16;
+      // Verified against a physical Construction Master 5:
+      // count is nearest whole number, with exact .5 ties rounded upward.
+      risers=Math.max(1,cm5RoundCount(rise/desiredRiser));
+      actualRiser=cm5RoundSixteenth(rise/risers);
       treads=Math.max(0,risers-1);
 
-      // If Run is also stored, Rise still determines risers/treads and Run determines tread width.
-      // If no Run is stored, use desired tread width.
+      // CM5 uses one fewer tread than risers. When total run is supplied,
+      // it rounds the per-tread width to the nearest 1/16 inch.
       run=hasRun?state.stair.run:(treads*desiredTread);
       rawTread=treads>0?run/treads:0;
-      actualTread=treads>0?(hasRun?Math.round(rawTread*16)/16:desiredTread):0;
+      actualTread=treads>0?(hasRun?cm5RoundSixteenth(rawTread):desiredTread):0;
     }else{
-      // Run-only mode from uploaded reference calculator test sheet:
-      // Run determines treads by nearest desired tread width.
       runOnly=true;
       run=state.stair.run;
-      treads=Math.max(1,Math.round(run/desiredTread));
+      treads=Math.max(1,cm5RoundCount(run/desiredTread));
       risers=treads+1;
       rise=risers*desiredRiser;
       actualRiser=desiredRiser;
       rawTread=run/treads;
-      actualTread=Math.round(rawTread*16)/16;
+      actualTread=cm5RoundSixteenth(rawTread);
     }
 
     const riserDiff=(actualRiser*risers)-rise;
     const treadDiff=(actualTread*treads)-run;
+    // CM5 stringer is the rounded one-step diagonal multiplied by tread count.
     const stringer=treads*Math.hypot(actualRiser,actualTread);
     const angle=actualTread?Math.atan(actualRiser/actualTread)*180/Math.PI:90;
 
@@ -6466,7 +6615,7 @@ body:after{
   function stairResultInfo(index){
     const c=stairCalc();
     if(!c)return null;
-    const i=((index%12)+12)%12;
+    const i=((index%8)+8)%8;
     if(i===0)return{label:'RISER HEIGHT',value:c.actualRiser,unit:'in',msg:'Actual riser height'};
     if(i===1)return{label:'NUMBER OF RISERS',value:c.risers,unit:null,msg:'Number of risers'};
     if(i===2)return{label:'RISER OVER / UNDER',value:c.riserDiff,unit:'in',msg:'Riser over/under '+signedInches(c.riserDiff)};
@@ -6474,18 +6623,14 @@ body:after{
     if(i===4)return{label:'NUMBER OF TREADS',value:c.treads,unit:null,msg:'Number of treads'};
     if(i===5)return{label:'TREAD OVER / UNDER',value:c.treadDiff,unit:'in',msg:'Tread over/under '+signedInches(c.treadDiff)};
     if(i===6)return{label:'STRINGER LENGTH',value:c.stringer/12,unit:'ft',msg:'Stringer length'};
-    if(i===7)return{label:'ANGLE OF INCLINE',value:c.angle,unit:null,msg:'Angle of incline '+(Math.round(c.angle*100)/100).toFixed(2),display:(Math.round(c.angle*100)/100).toFixed(2)};
-    if(i===8)return{label:'STORED RUN',value:c.run/12,unit:'ft',msg:'Stored run'};
-    if(i===9)return{label:'STORED RISE',value:c.rise/12,unit:'ft',msg:'Stored rise'};
-    if(i===10)return{label:'DESIRED RISER HEIGHT',value:c.desiredRiser,unit:'in',msg:'Stored desired riser height'};
-    return{label:'DESIRED TREAD WIDTH',value:c.desiredTread,unit:'in',msg:'Stored desired tread width'};
+    return{label:'ANGLE OF INCLINE',value:c.angle,unit:null,msg:'Angle of incline '+(Math.round(c.angle*100)/100).toFixed(2),display:(Math.round(c.angle*100)/100).toFixed(2)};
   }
   function showStairResult(index){
     const info=stairResultInfo(index);
     if(!info)return setMsg('Enter total rise or store Rise/Run, then press Stair.');
     const c=stairCalc();
     const warning=stairTreadWarning(c);
-    state.stair.resultIndex=((index%12)+12)%12;
+    state.stair.resultIndex=((index%8)+8)%8;
     state.lastCycle='stairResult';
     setAns(info.label,info.value,info.unit,(info.msg||'')+warning);
     if(info.display){state.displayText=info.display;render();}
@@ -6516,22 +6661,25 @@ body:after{
     if(state.conv){
       state.conv=false;
       const v=curIn();
+      if(!Number.isFinite(v)||v<=0)return setError('Desired stair dimension must be greater than zero.');
       if(v<=20){
         state.stair.riser=v;
-        state.stair.resultIndex=10;
+        state.stair.resultIndex=0;
         setAns('DESIRED RISER HEIGHT',v,'in','Desired riser height stored');
         addTape('Desired riser height = '+fmtInchesOnly(v));
         return;
       }
       state.stair.tread=v;
-      state.stair.resultIndex=11;
+      state.stair.resultIndex=0;
       setAns('DESIRED TREAD WIDTH',v,'in','Desired tread width stored');
       addTape('Desired tread width = '+fmtInchesOnly(v));
       return;
     }
 
     if(state.typing||state.comp.active){
-      state.stair.total=curIn();
+      const totalRise=curIn();
+      if(!Number.isFinite(totalRise)||totalRise<=0)return setError('Total stair rise must be greater than zero.');
+      state.stair.total=totalRise;
       state.stair.lastInput='rise';
       state.stair.mode=state.stair.run!=null?'riseRun':'riseOnly';
       state.stair.changed=true;
@@ -6562,8 +6710,10 @@ body:after{
   function circle(){
     if(state.conv){
       state.conv=false;
-      const deg=Number(prompt('Arc angle in degrees:','90'))||0;
+      const deg=Number(prompt('Arc angle in degrees:','90'));
       const rad=state.circle.radius==null?curIn()/2:state.circle.radius;
+      if(!Number.isFinite(rad)||rad<=0)return setError('Circle diameter must be greater than zero.');
+      if(!Number.isFinite(deg))return setError('Enter a valid arc angle.');
       const arc=2*Math.PI*rad*deg/360;
       setFt('ARC',arc,trim(deg)+' degree arc');
       addTape('Arc = '+fmtIn(arc));
@@ -6572,7 +6722,9 @@ body:after{
 
     const usedPending=finishPendingForTool();
     if(shouldUseCurrentForTool(usedPending)){
-      state.circle.diameter=curIn();
+      const diameter=curIn();
+      if(!Number.isFinite(diameter)||diameter<=0)return setError('Circle diameter must be greater than zero.');
+      state.circle.diameter=diameter;
       state.circle.radius=state.circle.diameter/2;
       state.circle.mode=0;
       state.cycleIndex.circle=0;
@@ -6580,7 +6732,9 @@ body:after{
       state.typing=false;
       state.comp=blankComp();
     }else if(state.circle.diameter==null){
-      state.circle.diameter=curIn();
+      const diameter=curIn();
+      if(!Number.isFinite(diameter)||diameter<=0)return setError('Circle diameter must be greater than zero.');
+      state.circle.diameter=diameter;
       state.circle.radius=state.circle.diameter/2;
       state.circle.mode=0;
       state.cycleIndex.circle=0;
@@ -6588,6 +6742,7 @@ body:after{
     }
 
     const d=state.circle.diameter;
+    if(!Number.isFinite(d)||d<=0)return setError('Circle diameter must be greater than zero.');
     const r=d/2;
     const mode=state.circle.mode%4;
 
@@ -6694,21 +6849,46 @@ body:after{
   function formatMathValue(v){if(!Number.isFinite(v))return'Error';const a=Math.abs(v);if(a>=1000000)return trim(Math.round(v*1000)/1000);return trim(Math.round(v*1000000)/1000000);}
   function sqrt(){
     const v=curValue();
+    const u=curUnit();
     if(state.conv){
       state.conv=false;
+      if(u==='weight')return setError('Weight cannot be squared.');
+      if(isAreaUnit(u))return setError('Squaring an area is not supported.');
       const out=v*v;
+      if(isLengthUnit(u)){
+        const areaUnit=areaUnitForLength(u);
+        setAns(areaLabel(areaUnit),out,areaUnit,'Squared area');
+        return;
+      }
       setAns('X^2',out,null,'Squared');
       state.displayText=formatMathValue(out);
       render();
       return;
     }
     if(v<0)return setError('Cannot take the square root of a negative number.');
+    if(isLengthUnit(u))return setError('Square root of a length is dimensionally invalid.');
+    if(u==='weight')return setError('Square root of a weight is dimensionally invalid.');
     const out=Math.sqrt(v);
+    if(isAreaUnit(u)){
+      const lengthUnit=lengthUnitForArea(u);
+      setAns('SQRT',out,lengthUnit,'Square root of area');
+      return;
+    }
     setAns('SQRT',out,null,'Square root');
     state.displayText=formatMathValue(out);
     render();
   }
-  function percent(){if(state.conv){state.conv=false;return setMsg('Fractions display to nearest 1/16 in.');}setAns('PERCENT',curValue()/100,null,'Percent as decimal');}
+  function percent(){
+    if(state.conv){state.conv=false;return setMsg('Fractions display to nearest 1/16 in.');}
+    const u=curUnit();
+    const out=curValue()/100;
+    if(u==='weight'&&state.weight){
+      const idx=state.weight.unitIndex||0;
+      state.weight.value=out;
+      state.weight.baseKg=out*WEIGHT_UNITS[idx].toKg;
+    }
+    setAns('PERCENT',out,u,'Percent as decimal');
+  }
   function memPlus(){if(state.conv){state.conv=false;state.memVal-=curValue();return setMsg('Subtracted from memory.');}state.memVal+=curValue();setMsg('Added to memory.');}
   function recall(){if(state.conv){state.conv=false;state.memVal=0;return setMsg('Memory cleared.');}setAns('RCL',state.memVal,null,'Memory recalled');}
   function showTape(){state.conv=false;if(!state.tape.length)return setMsg('Tape is empty.');alert(state.tape.join(String.fromCharCode(10)));setMsg('Tape shown.');}
@@ -6876,6 +7056,113 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     const n=Number(String(el&&el.value||'').trim());
     return Number.isFinite(n)?n:NaN;
   }
+  function ipmFormatLength(value){
+    const n=Number(value);
+    if(!Number.isFinite(n))return '';
+    const whole=Math.floor(n+1e-9);
+    const quarter=Math.round((n-whole)*4);
+    const fractions=['','1/4','1/2','3/4'];
+    if(quarter===0)return String(whole)+' in';
+    return (whole?whole+' ':'')+fractions[quarter]+' in';
+  }
+  function populateIpmSelects(){
+    const minutes=document.getElementById('ipmMinutes');
+    const seconds=document.getElementById('ipmSeconds');
+    const length=document.getElementById('ipmLength');
+    if(!minutes||!seconds||!length)return;
+    if(!minutes.options.length){
+      for(let i=0;i<=59;i++)minutes.add(new Option(String(i),String(i)));
+    }
+    if(!seconds.options.length){
+      for(let i=0;i<=59;i++)seconds.add(new Option(String(i).padStart(2,'0'),String(i)));
+    }
+    if(!length.options.length){
+      for(let q=1;q<=480;q++){
+        const inches=q/4;
+        length.add(new Option(ipmFormatLength(inches),String(inches)));
+      }
+      for(let inches=121;inches<=240;inches++){
+        length.add(new Option(String(inches)+' in',String(inches)));
+      }
+    }
+  }
+  let lastIpmResult=null;
+  function setIpmResult(valueText,detailText,warning){
+    const value=document.getElementById('ipmResultValue');
+    const detail=document.getElementById('ipmResultDetail');
+    const use=document.getElementById('ipmUseButton');
+    if(value)value.innerHTML=valueText||'—';
+    if(detail)detail.textContent=detailText||'';
+    if(use)use.disabled=!!warning||!lastIpmResult;
+  }
+  function calculateIpm(){
+    const minutes=numberFromInput('ipmMinutes');
+    const seconds=numberFromInput('ipmSeconds');
+    const length=numberFromInput('ipmLength');
+    const totalSeconds=minutes*60+seconds;
+    if(!Number.isFinite(minutes)||minutes<0||!Number.isFinite(seconds)||seconds<0||seconds>=60||!Number.isFinite(length)||length<=0||!Number.isFinite(totalSeconds)||totalSeconds<=0){
+      lastIpmResult=null;
+      setIpmResult('Check inputs','Elapsed time must be greater than zero and weld length must be positive.',true);
+      setHeatDisplay('Check inputs','Weld time must be greater than zero.','IPM',true);
+      return NaN;
+    }
+    const ipm=length*60/totalSeconds;
+    const ipmText=trim(Math.round(ipm*100)/100);
+    const secondsPerInch=totalSeconds/length;
+    const secondsPerInchText=trim(Math.round(secondsPerInch*100)/100);
+    const timeText=(minutes?minutes+' min ':'')+seconds+' sec';
+    lastIpmResult={ipm:ipm,ipmText:ipmText,minutes:minutes,seconds:seconds,length:length,totalSeconds:totalSeconds};
+    setIpmResult('<span>'+ipmText+'</span><span class="ipm-unit">IPM</span>',ipmFormatLength(length)+' • '+timeText+' • '+secondsPerInchText+' sec/in',false);
+    setHeatDisplay(heatMainHTML(ipmText,'IPM'),ipmFormatLength(length)+' welded in '+timeText,'IPM',false);
+    try{localStorage.setItem('arccalc_hr1_ipm',JSON.stringify({minutes:minutes,seconds:seconds,length:length}));}catch(e){}
+    return ipm;
+  }
+  function useIpmForHeatInput(){
+    if(!lastIpmResult||!Number.isFinite(lastIpmResult.ipm)||lastIpmResult.ipm<=0)return;
+    const travel=document.getElementById('heatTravel');
+    const unit=document.getElementById('heatSpeedUnit');
+    if(travel)travel.value=trim(Math.round(lastIpmResult.ipm*100)/100);
+    if(unit)unit.value='ipm';
+    setHeatDisplay(heatMainHTML(lastIpmResult.ipmText,'IPM'),'Copied to Heat Input travel speed.','IPM',false);
+    const sub=document.getElementById('ipmResultDetail');
+    if(sub)sub.textContent=ipmFormatLength(lastIpmResult.length)+' welded in '+((lastIpmResult.minutes?lastIpmResult.minutes+' min ':'')+lastIpmResult.seconds+' sec')+' • copied to Travel speed';
+  }
+  function clearIpm(){
+    populateIpmSelects();
+    const minutes=document.getElementById('ipmMinutes');
+    const seconds=document.getElementById('ipmSeconds');
+    const length=document.getElementById('ipmLength');
+    if(minutes)minutes.value='0';
+    if(seconds)seconds.value='30';
+    if(length)length.value='6';
+    lastIpmResult=null;
+    setIpmResult('—','Select a weld time and length, then press Calculate IPM.',true);
+    if(lastHeatResult)renderHeatDisplayFromLast();
+    else setHeatDisplay('—','Enter values, then press Calculate.','kJ/in',false);
+    try{localStorage.removeItem('arccalc_hr1_ipm');}catch(e){}
+  }
+  function loadIpm(){
+    populateIpmSelects();
+    const minutes=document.getElementById('ipmMinutes');
+    const seconds=document.getElementById('ipmSeconds');
+    const length=document.getElementById('ipmLength');
+    let saved={};
+    try{saved=JSON.parse(localStorage.getItem('arccalc_hr1_ipm')||'{}')||{};}catch(e){}
+    if(minutes)minutes.value=String(Number.isFinite(Number(saved.minutes))?saved.minutes:0);
+    if(seconds)seconds.value=String(Number.isFinite(Number(saved.seconds))?saved.seconds:30);
+    if(length)length.value=String(Number.isFinite(Number(saved.length))?saved.length:6);
+    lastIpmResult=null;
+    setIpmResult('—','Select a weld time and length, then press Calculate IPM.',true);
+  }
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('[data-ipm-action]');
+    if(!b)return;
+    const action=b.getAttribute('data-ipm-action');
+    if(action==='calculate')return calculateIpm();
+    if(action==='use')return useIpmForHeatInput();
+    if(action==='clear')return clearIpm();
+  });
+
   function syncHeatEfficiency(){
     const p=document.getElementById('heatProcess');
     const e=document.getElementById('heatEfficiency');
@@ -6914,12 +7201,12 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     const sub=document.getElementById('heatResultSub');
     const arc=document.getElementById('heatArcEnergy');
 
-    if(!Number.isFinite(volts)||volts<=0||!Number.isFinite(amps)||amps<=0||!Number.isFinite(travel)||travel<=0||!Number.isFinite(eff)||eff<=0){
+    if(!Number.isFinite(volts)||volts<=0||!Number.isFinite(amps)||amps<=0||!Number.isFinite(travel)||travel<=0||!Number.isFinite(eff)||eff<=0||eff>1){
       if(main)main.textContent='Check inputs';
-      if(sub)sub.textContent='Voltage, amperage, travel speed, and efficiency must be positive numbers.';
+      if(sub)sub.textContent='Voltage, amperage, and travel speed must be positive; efficiency must be greater than 0 and no more than 1.00.';
       if(arc)arc.textContent='—';
       lastHeatResult=null;
-      setHeatDisplay('Check inputs','Voltage, amperage, travel speed, and efficiency must be positive.','kJ/in',true);
+      setHeatDisplay('Check inputs','Efficiency must be between 0 and 1.00.','kJ/in',true);
       return;
     }
 
@@ -7003,32 +7290,40 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
   function parseSettingInches(text){
     let s=String(text||'').trim().toLowerCase();
     if(!s)return NaN;
-    const negative=/^-/.test(s);
-    s=s.replace(/^[+-]\s*/,'').replace(/[″"]/g,'').replace(/[′']/g,' ft ').replace(/-/g,' ').replace(/\s+/g,' ');
+    let sign=1;
+    const signMatch=s.match(/^([+-])\s*/);
+    if(signMatch){sign=signMatch[1]==='-'?-1:1;s=s.slice(signMatch[0].length);}
+    s=s.replace(/(\d)-(?=\d+\/\d+)/g,'$1 ');
+    if(/[+-]/.test(s))return NaN;
+    s=s.replace(/[″"]/g,' in ').replace(/[′']/g,' ft ').replace(/\binches?\b/g,' in ').replace(/\bfeet\b/g,' ft ').replace(/\s+/g,' ').trim();
     let feet=0;
-    const ftMatch=s.match(/(-?\d+(?:\.\d+)?)\s*ft/);
-    if(ftMatch){
-      feet=Number(ftMatch[1]);
-      s=s.replace(ftMatch[0],'').replace(/in|inch|inches/g,'').trim();
-    }else{
-      s=s.replace(/in|inch|inches/g,'').trim();
-    }
+    const ftMatches=[...s.matchAll(/(\d+(?:\.\d+)?)\s*ft\b/g)];
+    if(ftMatches.length>1)return NaN;
+    if(ftMatches.length===1){feet=Number(ftMatches[0][1]);s=(s.slice(0,ftMatches[0].index)+s.slice(ftMatches[0].index+ftMatches[0][0].length)).trim();}
+    s=s.replace(/\bin\b/g,' ').replace(/\s+/g,' ').trim();
+    if(/[^0-9.\/\s]/.test(s))return NaN;
+    const tokens=s?s.split(' ').filter(Boolean):[];
+    if(tokens.length>2)return NaN;
     let inches=0;
-    if(s){
-      const parts=s.split(' ').filter(Boolean);
-      for(const part of parts){
-        if(part.includes('/')){
-          const bits=part.split('/');
-          const n=Number(bits[0]),d=Number(bits[1]);
-          if(Number.isFinite(n)&&Number.isFinite(d)&&d!==0)inches+=n/d;
-        }else{
-          const n=Number(part);
-          if(Number.isFinite(n))inches+=n;
-        }
+    let sawWhole=false,sawFraction=false;
+    for(const token of tokens){
+      if(token.includes('/')){
+        if(sawFraction)return NaN;
+        const m=token.match(/^(\d+)\/(\d+)$/);
+        if(!m)return NaN;
+        const n=Number(m[1]),d=Number(m[2]);
+        if(!Number.isFinite(n)||!Number.isFinite(d)||d<=0)return NaN;
+        inches+=n/d;sawFraction=true;
+      }else{
+        if(sawWhole)return NaN;
+        if(!/^\d+(?:\.\d+)?$/.test(token))return NaN;
+        const n=Number(token);
+        if(!Number.isFinite(n))return NaN;
+        inches+=n;sawWhole=true;
       }
     }
-    const total=feet*12+inches;
-    return negative?-Math.abs(total):total;
+    if(!ftMatches.length&&!tokens.length)return NaN;
+    return sign*(feet*12+inches);
   }
   function openSettings(){
     const screen=document.getElementById('settingsScreen');
@@ -7120,8 +7415,9 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     });
   }
 
-  window.ArcCalcHR1={pressNum,pressUnit,pressOp,pressEq,resetAll,state};
+  window.ArcCalcHR1={pressNum,pressUnit,pressOp,pressEq,resetAll,state,stairCalc,stairExpectedDebug,stair,showStairResult,cycleStairResult,solveTri,circle,showCircleCycleMode,sqrt,percent,board,parseSettingInches,calculateHeatInput,calculateIpm,useIpmForHeatInput,clearIpm,cycleWeight,lengthKey,altOp,altNum,curValue,curUnit,curIn,convertTo,AISC_SHAPES_V16_0,beamUpdateLookup,beamPopulateDropdowns};
   bindPressFeedback();
+  loadIpm();
   loadHeatInput();
   resetAll();
 
@@ -7315,6 +7611,76 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     assert('negative square root is rejected', state.label==='ERROR' && /square root/i.test(state.msg));
 
     assert('negative settings input stays negative for validation', parseSettingInches('-7 1/2')===-7.5);
+    assert('settings reject zero denominator', Number.isNaN(parseSettingInches('7 1/0')));
+    assert('settings reject unrelated text', Number.isNaN(parseSettingInches('abc')));
+
+    populateIpmSelects();
+    document.getElementById('ipmMinutes').value='0';
+    document.getElementById('ipmSeconds').value='30';
+    document.getElementById('ipmLength').value='6';
+    assert('6 inches in 30 seconds equals 12 IPM', Math.abs(calculateIpm()-12)<0.000001);
+    useIpmForHeatInput();
+    assert('IPM result copies to heat-input travel speed', Number(document.getElementById('heatTravel').value)===12 && document.getElementById('heatSpeedUnit').value==='ipm');
+    document.getElementById('ipmMinutes').value='1';
+    document.getElementById('ipmSeconds').value='15';
+    document.getElementById('ipmLength').value='20';
+    assert('20 inches in 75 seconds equals 16 IPM', Math.abs(calculateIpm()-16)<0.000001);
+    document.getElementById('ipmMinutes').value='0';
+    document.getElementById('ipmSeconds').value='0';
+    assert('zero elapsed time is rejected for IPM', Number.isNaN(calculateIpm()) && !lastIpmResult);
+
+    resetAll();
+    pressNum('10');pressUnit('ft');pressOp('/');pressNum('2');pressUnit('ft');pressEq();
+    assert('length divided by length returns ratio', !curUnit() && Math.abs(curValue()-5)<0.0001);
+
+    resetAll();
+    pressNum('4');pressUnit('ft');conv();sqrt();
+    assert('square of 4 ft is 16 sq ft', curUnit()==='sqft' && Math.abs(curValue()-16)<0.0001);
+    sqrt();
+    assert('square root of 16 sq ft is 4 ft', curUnit()==='ft' && Math.abs(curValue()-4)<0.0001);
+
+    resetAll();
+    pressNum('50');pressUnit('ft');percent();
+    assert('percent preserves length unit', curUnit()==='ft' && Math.abs(curValue()-0.5)<0.0001);
+
+    resetAll();
+    pressNum('10');altOp('-');circle();
+    assert('negative circle diameter rejected', state.label==='ERROR' && /diameter/i.test(state.msg));
+
+    resetAll();
+    pressNum('5');pressUnit('in');lengthKey('diag','DIAG');
+    pressNum('10');pressUnit('in');lengthKey('run','RUN');
+    lengthKey('rise','RISE');
+    assert('impossible triangle rejected', state.label==='ERROR' && /diagonal/i.test(state.msg));
+
+    resetAll();
+    pressNum('2');board();pressNum('6');board();pressNum('8');pressUnit('ft');board();
+    assert('board foot workflow clears each stored entry', state.label==='BD FT' && Math.abs(curValue()-8)<0.0001);
+
+    resetAll();
+    state.stair.total=80;state.stair.run=100;state.stair.riser=7.5;state.stair.tread=10;
+    let cm5=stairCalc();
+    assert('CM5 80x100 risers', cm5.risers===11 && Math.abs(cm5.actualRiser-7.25)<1e-9);
+    assert('CM5 80x100 treads', cm5.treads===10 && Math.abs(cm5.actualTread-10)<1e-9);
+    assert('CM5 80x100 stringer', fmtInchesOnly(cm5.stringer)==='123 1/2 in');
+    assert('CM5 80x100 angle', (Math.round(cm5.angle*100)/100).toFixed(2)==='35.94');
+
+    state.stair.total=112.375;state.stair.run=144;cm5=stairCalc();
+    assert('CM5 9ft 4-3/8 by 12ft risers', cm5.risers===15 && Math.abs(cm5.actualRiser-7.5)<1e-9);
+    assert('CM5 9ft 4-3/8 by 12ft tread', cm5.treads===14 && Math.abs(cm5.actualTread-10.3125)<1e-9);
+    assert('CM5 second reference stringer', fmtIn(cm5.stringer)==='14 ft 10 1/2 in');
+    assert('CM5 second reference angle', (Math.round(cm5.angle*100)/100).toFixed(2)==='36.03');
+
+    state.stair.total=77;state.stair.run=100;cm5=stairCalc();
+    assert('CM5 nearest count chooses 10 risers', cm5.risers===10 && Math.abs(cm5.actualRiser-7.6875)<1e-9);
+    assert('CM5 77x100 stringer', fmtInchesOnly(cm5.stringer)==='121 11/16 in');
+
+    state.stair.total=78.75;state.stair.run=100;cm5=stairCalc();
+    assert('CM5 exact half tie rounds up to 11 risers', cm5.risers===11 && Math.abs(cm5.actualRiser-7.1875)<1e-9);
+    assert('CM5 78-3/4 x 100 stringer', fmtInchesOnly(cm5.stringer)==='123 1/8 in');
+    showStairResult(7);
+    cycleStairResult(1);
+    assert('CM5 stair sequence repeats after incline angle', state.label==='RISER HEIGHT' && state.stair.resultIndex===0);
 
     console.log('ARCcalc HR1 self-tests passed');
   }

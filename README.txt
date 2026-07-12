@@ -1,5 +1,5 @@
 ARCcalc HR1
-5.18 Beta PWA
+5.21 Beta PWA
 
 Open index.html in a browser for a local preview. For installable/offline PWA behavior, serve this folder over HTTPS or localhost.
 
@@ -107,3 +107,29 @@ v5.6 DISPLAY NOTE
 
 - Added counter-shading beneath the iOS 27 standalone status-bar separator so the system-rendered hairline visually blends into the ARCcalc header.
 - Settings shows only “5.18 Beta” under App version.
+
+
+## 5.19 Beta — CM5 Stair + Math Integrity
+- Matched the verified Construction Master 5 stair count, 1/16-inch rounding, over/under, stringer, and angle behavior.
+- Added regression references for 80 × 100 in, 9 ft 4-3/8 in × 12 ft, 77 × 100 in, and the 78-3/4 in half-tie case.
+- Rejects impossible right triangles instead of silently changing them.
+- Preserves dimensional units for percent; squares lengths into natural area units and square-roots areas back into lengths.
+- Rejects non-positive circle diameters and invalid Settings fractions.
+- Enforces positive stair targets and weld efficiency from 0 through 1.00.
+- Supports length divided by length as a dimensionless ratio.
+- Repairs the dormant board-foot multi-entry workflow.
+- Settings shows only “5.19 Beta” under App version.
+
+
+## 5.20 Beta — Weld Travel Speed (IPM)
+- Added elapsed minutes and seconds dropdowns in the Weld tab.
+- Added a weld-length dropdown in inches.
+- Calculates travel speed using length × 60 ÷ elapsed seconds.
+- Can copy the result directly into Heat Input travel speed.
+- Includes zero-time and invalid-length validation.
+
+
+## 5.21 Beta — Weld Layout Order
+- Kept Welding Parameters at the top of the Weld tab.
+- Moved Travel Speed (IPM) directly below Welding Parameters.
+- No welding formulas or input behavior changed.
