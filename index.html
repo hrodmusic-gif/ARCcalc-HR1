@@ -4900,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.16 Beta -->
+  <!-- ARCcalc HR1 v5.17 Beta -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5441,7 +5441,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>v5.16 Beta</strong>
+                <strong>5.17 Beta</strong>
               </div>
             </section>
 
@@ -7831,6 +7831,36 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       }
       .calculator:before{
         display:none!important;
+      }
+    }
+  </style>
+
+
+  <style id="arccalc-status-seam-mask-v517">
+    /* ARCcalc HR1 v5.17 Beta — definitive iOS status-area seam removal.
+       The remaining line is rendered exactly at the bottom of the iPhone safe
+       area, not by the calculator frame. Paint a thin strip over that boundary
+       using the identical top-surface color. */
+    @media(max-width:520px) and (orientation:portrait){
+      html,body,.wrap,.calculator{
+        border-top:0!important;
+        outline:0!important;
+        -webkit-box-shadow:none!important;
+      }
+      html.arc-installed.arc-ios body::after{
+        content:"";
+        position:fixed;
+        left:0;
+        right:0;
+        top:calc(env(safe-area-inset-top, 0px) - 2px);
+        height:4px;
+        background:#222b38;
+        border:0;
+        outline:0;
+        box-shadow:none;
+        pointer-events:none;
+        z-index:2147483647;
+        transform:translateZ(0);
       }
     }
   </style>

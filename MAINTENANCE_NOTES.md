@@ -1,3 +1,9 @@
+# ARCcalc HR1 5.17 Beta
+
+- Removed the persistent one-pixel iPhone status-area divider with a dedicated safe-area seam mask.
+- Settings now shows only `5.17 Beta` under App version.
+- Keypad, logo placement, and approved bottom navigation remain unchanged.
+
 # ARCcalc HR1 v5.6 Maintenance Notes
 
 ## Bottom-fill layout work completed in v5.6
@@ -105,8 +111,8 @@ Safari and Chrome do not guarantee orientation locking for a normal browser tab.
 - Preserves the approved bottom navigation, key sizing, full-screen layout, and unified top color.
 
 
-## v5.16 Beta
+## 5.17 Beta
 - Removed the mobile calculator top inset/frame shadow that created a horizontal divider below the iPhone status bar.
 - Retained a subtle bottom inset only; no geometry or control sizing changed.
-- Simplified the Settings version label to `v5.16 Beta`.
+- Simplified the Settings version label to `5.17 Beta`.
 - Bumped the offline cache to `arccalc-hr1-v5-16-beta`.
