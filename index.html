@@ -4875,10 +4875,10 @@ body:after{
 <!-- ARCcalc HR1 v1.1 Official -->
 <!-- ARCcalc HR1 v1.1 Official -->
 <!-- ARCcalc HR1 v1.2 Remove Heat Top Unit -->
-<!-- ARCcalc HR1 v1.6 History and Weld Stopwatch -->
+<!-- ARCcalc HR1 v1.7 History and Weld Stopwatch -->
 <!-- ARCcalc HR1 v1.3 Settings Cutoff Fix -->
-<!-- ARCcalc HR1 v1.6 iPhone Full Screen -->
-<!-- ARCcalc HR1 v1.6 iPhone Fit Fix -->
+<!-- ARCcalc HR1 v1.7 iPhone Full Screen -->
+<!-- ARCcalc HR1 v1.7 iPhone Fit Fix -->
 <!-- ARCcalc HR1 v2.9 Compact Display Spacing -->
 <!-- ARCcalc HR1 v3.0 Maintenance Pass: consolidated release metadata; runtime logic preserved -->
 <!-- ARCcalc HR1 v3.1 Shapes Text and Dimensions Cleanup -->
@@ -5375,7 +5375,7 @@ body:after{
 
 
 <style id="arccalc-v1-4-history-stopwatch">
-/* ARCcalc HR1 v1.6 — calculation history and weld stopwatch */
+/* ARCcalc HR1 v1.7 — calculation history and weld stopwatch */
 .brand{position:relative}
 .history-trigger{
   position:absolute!important;right:2px;bottom:2px;width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;
@@ -5439,8 +5439,8 @@ body:after{
 }
 </style>
 
-<style id="arccalc-v1-6-stability">
-/* ARCcalc HR1 v1.6 — compact Travel Speed workflow and stability repairs */
+<style id="arccalc-v1-7-stability">
+/* ARCcalc HR1 v1.7 — compact Travel Speed workflow and stability repairs */
 .ipm-card-heading{margin-bottom:10px!important}
 .ipm-reset-button{
   width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;display:grid!important;place-items:center!important;
@@ -5477,6 +5477,20 @@ body:after{
   .ipm-result-panel{grid-template-columns:1fr!important}.ipm-use-button{min-height:38px!important}
   .compact-stopwatch .stopwatch-display{font-size:29px!important}
 }
+</style>
+
+<style id="arccalc-v1-7-stability">
+.history-entry{grid-template-rows:auto auto auto!important;gap:3px 10px!important;min-height:78px!important;padding:11px 12px!important}
+.history-entry-expression{min-width:0;color:#9eb4c8;font-size:11px;font-weight:750;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+.history-entry-result{grid-column:1/-1;color:#f3f9ff;font-size:17px;font-weight:900;line-height:1.25;white-space:normal;overflow-wrap:anywhere;letter-spacing:-.02em}
+.history-entry-time{grid-column:2;grid-row:1;color:rgba(174,206,232,.56);font-size:10px;font-weight:800;white-space:nowrap;align-self:start}
+.history-entry-hint{grid-column:1/-1;color:#64caff;font-size:9px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.history-entry-line{display:none!important}
+.history-close,.history-clear,.ipm-reset-button,.ipm-mode-button,.stopwatch-control-button,.stopwatch-button{min-height:44px!important}
+.history-close{width:44px!important;height:44px!important}
+.history-clear{height:44px!important}
+.ipm-reset-button{width:44px!important;height:44px!important}
+.ipm-mode-button{height:44px!important}
 </style>
 </head>
 <body>
@@ -5600,7 +5614,7 @@ body:after{
             <div class="settings-group-label">About</div>
             <section class="settings-card v1-settings-card about-card">
               <h3>About ARCcalc</h3>
-              <div class="settings-static"><span>App version</span><strong>1.6</strong></div>
+              <div class="settings-static"><span>App version</span><strong>1.7</strong></div>
               <div class="settings-static"><span>Shape database</span><strong>AISC v16.0</strong></div>
               <div class="settings-static"><span>Release channel</span><strong>Stable</strong></div>
               <p class="settings-note small">Calculation and reference aid for structural-steel fabrication, fitting, QA, and welding inspection. Verify safety-critical work against approved drawings, procedures, codes, and project requirements.</p>
@@ -5834,13 +5848,48 @@ body:after{
   const appSettings=loadAppSettings();
   const state={entry:'0',typing:false,unit:null,comp:blankComp(),pending:null,repeat:null,displayText:null,error:null,label:'READY',msg:'Ready',conv:false,memVal:0,tape:[],tri:{pitch:null,rise:null,run:null,diag:null},triActive:false,pitchMode:0,lastCycle:null,cycleIndex:{pitch:0,circle:0},board:{step:0,t:null,w:null},stair:{total:null,run:null,riser:appSettings.riser,tread:appSettings.tread,resultIndex:0,changed:false,lastInput:null,mode:null},roofSpan:null,jack:{spacing:16,side:'R'},circle:{radius:null,diameter:null,mode:0},density:490,weight:{value:null,unitIndex:0,baseKg:null,convert:false}};
   const HISTORY_STORAGE_KEY='arccalc_hr1_calculation_history_v1';
+  function splitHistoryCalculation(line,fallbackResult){
+    const raw=String(line||'').trim();
+    const marker=' = ';
+    const index=raw.lastIndexOf(marker);
+    const expression=(index>=0?raw.slice(0,index):raw)||'Calculation';
+    const result=(index>=0?raw.slice(index+marker.length):String(fallbackResult||''))||'—';
+    return{expression:expression,result:result};
+  }
+  function historyResultText(value,unit,weightUnitIndex){
+    if(!Number.isFinite(Number(value)))return '—';
+    if(state.displayText)return String(state.displayText);
+    try{return disp(Number(value),unit,weightUnitIndex);}catch(e){return trim(Number(value));}
+  }
   function loadCalculationHistory(){
     try{
       const parsed=JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY)||'[]');
-      return Array.isArray(parsed)?parsed.filter(function(item){return item&&typeof item.line==='string'&&Number.isFinite(Number(item.value));}).slice(0,20):[];
+      if(!Array.isArray(parsed))return [];
+      return parsed.map(function(item){
+        if(!item||!Number.isFinite(Number(item.value)))return null;
+        const raw=String(item.line||'').trim();
+        const split=splitHistoryCalculation(raw,String(item.result||''));
+        return Object.assign({},item,{
+          line:split.expression+' = '+split.result,
+          expression:String(item.expression||split.expression||'Calculation'),
+          result:String(item.result||split.result||'—')
+        });
+      }).filter(Boolean).slice(0,20);
     }catch(e){return [];}
   }
   let calculationHistory=loadCalculationHistory();
+  let historyReturnFocus=null;
+  let settingsReturnFocus=null;
+  function modalFocusable(screen){
+    return screen?[...screen.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),summary,[href],[tabindex]:not([tabindex="-1"])')].filter(function(el){return !el.hidden&&el.offsetParent!==null;}):[];
+  }
+  function focusModal(screen,preferredSelector){
+    requestAnimationFrame(function(){
+      const preferred=screen&&screen.querySelector(preferredSelector||'button');
+      const list=modalFocusable(screen);
+      (preferred||list[0]||screen)?.focus();
+    });
+  }
   function saveCalculationHistory(){try{localStorage.setItem(HISTORY_STORAGE_KEY,JSON.stringify(calculationHistory));}catch(e){}}
   function historyTimeText(timestamp){
     try{return new Date(timestamp).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});}catch(e){return '';}
@@ -5849,7 +5898,7 @@ body:after{
     const list=document.getElementById('historyList');
     const empty=document.getElementById('historyEmpty');
     const count=document.getElementById('historyCount');
-    if(count)count.textContent=calculationHistory.length+' saved';
+    if(count)count.textContent=calculationHistory.length+' calculation'+(calculationHistory.length===1?'':'s');
     if(!list||!empty)return;
     list.innerHTML='';
     empty.classList.toggle('is-visible',calculationHistory.length===0);
@@ -5858,20 +5907,28 @@ body:after{
       button.type='button';
       button.className='history-entry';
       button.setAttribute('data-history-id',String(item.id));
-      const line=document.createElement('span');line.className='history-entry-line';line.textContent=item.line;
+      button.setAttribute('aria-label','Restore '+item.expression+' equals '+item.result);
+      const expression=document.createElement('span');expression.className='history-entry-expression';expression.textContent=item.expression;
+      const result=document.createElement('span');result.className='history-entry-result';result.textContent=item.result;
       const time=document.createElement('span');time.className='history-entry-time';time.textContent=historyTimeText(item.created);
-      const hint=document.createElement('span');hint.className='history-entry-hint';hint.textContent='Tap to restore';
-      button.appendChild(line);button.appendChild(time);button.appendChild(hint);list.appendChild(button);
+      const hint=document.createElement('span');hint.className='history-entry-hint';hint.textContent='Tap to restore result';
+      button.appendChild(expression);button.appendChild(time);button.appendChild(result);button.appendChild(hint);list.appendChild(button);
     });
   }
   function recordCalculationHistory(line){
     const value=curValue();
     if(!line||!Number.isFinite(value)||state.error)return;
     const unit=curUnit();
+    const weightUnitIndex=unit==='weight'&&state.weight?state.weight.unitIndex:null;
+    const fallback=historyResultText(value,unit,weightUnitIndex);
+    const parts=splitHistoryCalculation(String(line),fallback);
     const item={
       id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),
-      line:String(line),value:value,unit:unit||null,
-      weightUnitIndex:unit==='weight'&&state.weight?state.weight.unitIndex:null,
+      line:parts.expression+' = '+parts.result,
+      expression:parts.expression,
+      result:parts.result,
+      value:value,unit:unit||null,
+      weightUnitIndex:weightUnitIndex,
       displayText:state.displayText||null,label:state.label||'ANSWER',created:Date.now()
     };
     calculationHistory.unshift(item);
@@ -5881,16 +5938,22 @@ body:after{
   }
   function openHistory(){
     const screen=document.getElementById('history');
-    closeSettings();
-    if(screen){renderHistoryPanel();screen.classList.add('is-open');screen.setAttribute('aria-hidden','false');}
+    closeSettings(false);
+    historyReturnFocus=document.activeElement;
+    if(screen){renderHistoryPanel();screen.classList.add('is-open');screen.setAttribute('aria-hidden','false');focusModal(screen,'.history-close');}
   }
-  function closeHistory(){const screen=document.getElementById('history');if(screen){screen.classList.remove('is-open');screen.setAttribute('aria-hidden','true');}}
+  function closeHistory(restoreFocus){
+    const screen=document.getElementById('history');
+    if(screen){screen.classList.remove('is-open');screen.setAttribute('aria-hidden','true');}
+    if(restoreFocus!==false&&historyReturnFocus&&typeof historyReturnFocus.focus==='function')historyReturnFocus.focus();
+    historyReturnFocus=null;
+  }
   function clearCalculationHistory(){calculationHistory=[];saveCalculationHistory();renderHistoryPanel();}
   function restoreCalculationHistory(id){
     const item=calculationHistory.find(function(entry){return String(entry.id)===String(id);});
     if(!item||!Number.isFinite(Number(item.value)))return;
     state.error=null;state.entry=trim(Number(item.value));state.unit=item.unit||null;state.comp=blankComp();state.typing=false;
-    state.pending=null;state.repeat=null;state.displayText=item.displayText||null;state.label='HISTORY';state.msg=item.line;
+    state.pending=null;state.repeat=null;state.displayText=item.displayText||null;state.label='HISTORY';state.msg=(item.expression||'Calculation')+' = '+(item.result||item.line||'');
     state.conv=false;state.lastCycle=null;state.measureCycle=null;state.unitCycle=null;clearNextInputUnitOverride();
     if(item.unit==='weight'){
       const idx=Number.isFinite(Number(item.weightUnitIndex))?Number(item.weightUnitIndex):0;
@@ -6300,7 +6363,27 @@ body:after{
     const inches=curIn(),v=inches/UNIT[u].toIn;
     state.conv=false;setAns('CONVERT',v,u,trim(inches)+' total inches');addTape('Convert = '+disp(v,u));
   }
-  function altOp(op){state.conv=false;const v=curValue();if(op==='*')return v===0?setError('Cannot take the reciprocal of zero.'):setAns('1/X',1/v,null,'Reciprocal');if(op==='-')return setAns('+/-',-v,curUnit(),'Sign changed');if(op==='+')return setAns('PI',Math.PI,null,'Pi');if(op==='/')return pressOp('/');}
+  function altOp(op){
+    state.conv=false;
+    const v=curValue();
+    const unit=curUnit();
+    if(op==='*'){
+      if(v===0)return setError('Cannot take the reciprocal of zero.');
+      if(unit)return setError('Reciprocal requires a unitless number.');
+      return setAns('1/X',1/v,null,'Reciprocal');
+    }
+    if(op==='-'){
+      const next=-v;
+      if(unit==='weight'&&state.weight){
+        const idx=Number.isFinite(Number(state.weight.unitIndex))?Number(state.weight.unitIndex):0;
+        state.weight={value:next,unitIndex:idx,baseKg:next*WEIGHT_UNITS[idx].toKg,convert:false};
+        state.lastCycle='weight';
+      }
+      return setAns('+/-',next,unit,'Sign changed');
+    }
+    if(op==='+')return setAns('PI',Math.PI,null,'Pi');
+    if(op==='/')return pressOp('/');
+  }
   function altNum(n){state.conv=false;if(n==='6')return resetAll();if(n==='5'){state.jack.spacing=curValue();return setAns('O.C.',state.jack.spacing,'in','Jack spacing stored');}if(n==='7'){const v=curIn();if(!Number.isFinite(v)||v<=0)return setError('Desired riser height must be greater than zero.');state.stair.riser=v;state.stair.resultIndex=0;state.stair.changed=true;setAns('DESIRED RISER HEIGHT',state.stair.riser,'in','Desired riser height stored');addTape('Desired riser height = '+fmtInchesOnly(state.stair.riser));return;}if(n==='9'){const v=curIn();if(!Number.isFinite(v)||v<=0)return setError('Desired tread width must be greater than zero.');state.stair.tread=v;state.stair.resultIndex=0;state.stair.changed=true;setAns('DESIRED TREAD WIDTH',state.stair.tread,'in','Desired tread width stored');addTape('Desired tread width = '+fmtInchesOnly(state.stair.tread));return;}if(n==='0'){state.density=curValue();return setAns('DENSITY',state.density,null,'Density stored');}pressNum(n);}
   function solveTri(){
     const t=state.tri;
@@ -7070,7 +7153,7 @@ body:after{
 
   function normBeamPart(v){return String(v||'').trim().replace(/\s+/g,'').replace(/[x×]/gi,'');}
   function beamNiceNum(v,unit){if(v==null||v==='')return '—';const n=Number(v);if(!Number.isFinite(n))return String(v);let s=(Math.abs(n)>=100?String(Math.round(n*1000)/1000):String(Math.round(n*10000)/10000));s=s.replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');return unit?s+' '+unit:s;}
-  function beamFracText(v){if(v==null||v==='')return '—';const n=Number(v);if(!Number.isFinite(n))return String(v);const sign=n<0?'-':'';let a=Math.abs(n);let whole=Math.floor(a+1e-9);let num=Math.round((a-whole)*16);if(num===16){whole++;num=0;}function gcd(x,y){while(y){const t=x%y;x=y;y=t;}return x||1;}if(!num)return sign+String(whole);const g=gcd(num,16);const f=(num/g)+'/'+(16/g);return sign+(whole?whole+' '+f:f);}
+  function beamFracText(v){if(v==null||v==='')return '—';const n=Number(v);if(!Number.isFinite(n))return String(v);const sign=n<0?'-':'';let a=Math.abs(n);let whole=Math.floor(a+1e-9);let num=Math.round((a-whole)*16);if(num===16){whole++;num=0;}if(!num)return sign+String(whole);const g=gcd(num,16);const f=(num/g)+'/'+(16/g);return sign+(whole?whole+' '+f:f);}
   function beamInchFrac(v){return v==null||v===''?'—':beamFracText(v)+' in';}
   function beamInchDec(v){return v==null||v===''?'':beamNiceNum(v,'in');}
   function beamDimHTML(fracVal,decVal){if(fracVal==null||fracVal==='')return '—';if(typeof fracVal==='string')return beamFormatGauge(fracVal);return '<span class="beam-dim-frac">'+beamInchFrac(fracVal)+'</span>';}
@@ -7239,6 +7322,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
   function setIpmEntryMode(mode,persist){
     mode=mode==='stopwatch'?'stopwatch':'manual';
     const changed=ipmEntryMode!==mode;
+    if(mode==='manual'&&weldStopwatch.running)stopWeldStopwatch();
     ipmEntryMode=mode;
     document.querySelectorAll('[data-ipm-mode]').forEach(function(button){
       const active=button.getAttribute('data-ipm-mode')===mode;
@@ -7358,6 +7442,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     const unit=document.getElementById('heatSpeedUnit');
     if(travel)travel.value=formatIpmValue(lastIpmResult.ipm);
     if(unit)unit.value='ipm';
+    invalidateHeatInputResult('Travel speed updated from IPM. Press Calculate Heat Input.');
     const sub=document.getElementById('ipmResultDetail');
     if(sub)sub.textContent=ipmFormatLength(lastIpmResult.length)+' welded in '+(lastIpmResult.stopwatch?stopwatchTimeText(lastIpmResult.totalSeconds):((lastIpmResult.minutes?lastIpmResult.minutes+' min ':'')+lastIpmResult.seconds+' sec'))+' • copied to Travel speed';
   }
@@ -7432,6 +7517,10 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     if(p.value!=='custom')e.value=p.value;
   }
   let lastHeatResult=null;
+  function invalidateHeatInputResult(message){
+    lastHeatResult=null;
+    setHeatDisplay('—',message||'Parameters changed. Press Calculate Heat Input.','kJ/in',false);
+  }
   function setHeatDisplay(mainText, subText, rightText, warning){
     const box=document.querySelector('.heat-display');
     const main=document.getElementById('heatDisplayMain');
@@ -7494,6 +7583,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     if(u)u.value='ipm';
     syncHeatEfficiency();
     lastHeatResult=null;
+    try{localStorage.removeItem('arccalc_hr1_heat');}catch(e){}
     setHeatDisplay('—','Enter values, then press Calculate.','kJ/in',false);
   }
   function loadHeatInput(){
@@ -7509,9 +7599,14 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       if(!saved.eff)syncHeatEfficiency();
     }catch(e){syncHeatEfficiency();}
   }
-  document.addEventListener('change',function(e){
-    if(e.target&&e.target.id==='heatProcess')syncHeatEfficiency();
-  });
+  const HEAT_SOURCE_IDS=new Set(['heatVolts','heatAmps','heatTravel','heatEfficiency','heatSpeedUnit','heatProcess']);
+  function handleHeatSourceChange(e){
+    if(!e.target||!HEAT_SOURCE_IDS.has(e.target.id))return;
+    if(e.target.id==='heatProcess')syncHeatEfficiency();
+    invalidateHeatInputResult('Parameters changed. Press Calculate Heat Input.');
+  }
+  document.addEventListener('input',handleHeatSourceChange);
+  document.addEventListener('change',handleHeatSourceChange);
   document.addEventListener('click',function(e){
     const b=e.target.closest('[data-heat-action]');
     if(!b)return;
@@ -7576,11 +7671,14 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     const tw=document.getElementById('settingTreadWidth');
     if(rh)rh.value=mixedNumberText(state.stair.riser||appSettings.riser);
     if(tw)tw.value=mixedNumberText(state.stair.tread||appSettings.tread);
-    if(screen){screen.classList.add('is-open');screen.setAttribute('aria-hidden','false');}
+    settingsReturnFocus=document.activeElement;
+    if(screen){screen.classList.add('is-open');screen.setAttribute('aria-hidden','false');focusModal(screen,'.settings-close');}
   }
-  function closeSettings(){
+  function closeSettings(restoreFocus){
     const screen=document.getElementById('settingsScreen');
     if(screen){screen.classList.remove('is-open');screen.setAttribute('aria-hidden','true');}
+    if(restoreFocus!==false&&settingsReturnFocus&&typeof settingsReturnFocus.focus==='function')settingsReturnFocus.focus();
+    settingsReturnFocus=null;
   }
   function saveSettings(){
     const rh=document.getElementById('settingRiserHeight');
@@ -7614,6 +7712,19 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     beamUpdateLookup();
   render();
   }
+  document.addEventListener('keydown',function(e){
+    const history=document.getElementById('history');
+    const settings=document.getElementById('settingsScreen');
+    const screen=history&&history.classList.contains('is-open')?history:(settings&&settings.classList.contains('is-open')?settings:null);
+    if(!screen)return;
+    if(e.key==='Escape'){e.preventDefault();if(screen===history)closeHistory();else closeSettings();return;}
+    if(e.key!=='Tab')return;
+    const list=modalFocusable(screen);
+    if(!list.length)return;
+    const first=list[0],last=list[list.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  });
   document.addEventListener('click',function(e){
     const actionButton=e.target.closest('[data-history-action]');
     if(actionButton){
@@ -7671,7 +7782,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     });
   }
 
-  window.ArcCalcHR1={pressNum,pressUnit,pressOp,pressEq,resetAll,state,stairCalc,stairExpectedDebug,stair,showStairResult,cycleStairResult,solveTri,circle,showCircleCycleMode,sqrt,percent,board,parseSettingInches,calculateHeatInput,calculateIpm,useIpmForHeatInput,clearIpm,formatIpmValue,cycleWeight,lengthKey,altOp,altNum,curValue,curUnit,curIn,convertTo,AISC_SHAPES_V16_0,beamUpdateLookup,beamPopulateDropdowns,openHistory,closeHistory,clearCalculationHistory,restoreCalculationHistory,startWeldStopwatch,stopWeldStopwatch,resetWeldStopwatch,weldStopwatch,setIpmEntryMode,renderHistoryPanel};
+  window.ArcCalcHR1={pressNum,pressUnit,pressOp,pressEq,resetAll,state,stairCalc,stairExpectedDebug,stair,showStairResult,cycleStairResult,solveTri,circle,showCircleCycleMode,sqrt,percent,board,parseSettingInches,calculateHeatInput,calculateIpm,useIpmForHeatInput,clearIpm,formatIpmValue,invalidateHeatInputResult,clearHeatInput,weight,loadHeatInput,runSelfTests,cycleWeight,lengthKey,altOp,altNum,curValue,curUnit,curIn,convertTo,AISC_SHAPES_V16_0,beamUpdateLookup,beamPopulateDropdowns,openHistory,closeHistory,clearCalculationHistory,restoreCalculationHistory,startWeldStopwatch,stopWeldStopwatch,resetWeldStopwatch,weldStopwatch,setIpmEntryMode,renderHistoryPanel};
   bindPressFeedback();
   renderHistoryPanel();
   loadIpm();
@@ -8484,29 +8595,6 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
         border-top:0!important;
         outline:0!important;
         -webkit-box-shadow:none!important;
-      }
-      html.arc-installed.arc-ios body::after{
-        content:"";
-        position:fixed;
-        left:0;
-        right:0;
-        top:calc(env(safe-area-inset-top, 0px) - 2px);
-        height:4px;
-        background:linear-gradient(to bottom,
-          #222b38 0,
-          #222b38 2px,
-          #121c2a 2px,
-          #121c2a 2.5px,
-          #0b1423 2.5px,
-          #0b1423 3px,
-          #222b38 3px,
-          #222b38 100%);
-        border:0;
-        outline:0;
-        box-shadow:none;
-        pointer-events:none;
-        z-index:2147483647;
-        transform:translateZ(0);
       }
     }
   </style>

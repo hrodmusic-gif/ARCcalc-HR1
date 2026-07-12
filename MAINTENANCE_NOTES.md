@@ -1,18 +1,13 @@
-# ARCcalc HR1 v1.6
+# ARCcalc HR1 v1.7
 
-## Stability repairs
+## Stability and history repairs
 
-- Preserves sufficient decimal precision for valid very-low travel-speed results instead of rounding them to zero.
-- Transfers the same nonzero precision into Heat Input.
-- Clears and disables an old IPM result whenever a new stopwatch timing run begins or the stopwatch is reset.
-- Keeps IPM calculations inside the Travel Speed result panel so they no longer replace the Heat Input Result screen.
-
-## Settings and accessibility
-
-- Calculator Guide is collapsed by default and opens only when requested.
-- Increased the calculation-history and bottom-tab touch targets to at least 44 CSS pixels on phones.
-
-## Package cleanup
-
-- Removed four unused source/overlay images from the production PWA package.
-- Existing calculator, stair, weight, shape, history, unit-conversion, heat-input, and IPM formulas remain unchanged except for IPM display/transfer precision.
+- Calculation History now stores and displays the full expression and calculated result separately.
+- Negative weight values retain their sign while cycling units.
+- Heat Input results are invalidated whenever any source parameter changes.
+- Transferring a new IPM invalidates the previous Heat Input result.
+- Switching from Stopwatch to Manual pauses the running timer.
+- Clear removes saved Heat Input parameters from local storage.
+- Reciprocal rejects dimensioned values until inverse-unit support exists.
+- History and Settings dialogs now manage keyboard focus and Escape-to-close behavior.
+- Removed the legacy iOS separator overlay and duplicate nested GCD declaration.

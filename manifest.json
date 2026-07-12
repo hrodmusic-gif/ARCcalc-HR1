@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 v1.6 steel fabrication calculator with stability repairs, collapsible calculator guide, Manual/Stopwatch weld travel-speed workflow, calculation history, stair layout, AISC v16.0 shape lookup, structural math, and welding heat input.",
+  "description": "ARCcalc HR1 v1.7 steel fabrication calculator with full calculation history, welding state integrity, stopwatch safety, stair layout, AISC v16.0 shape lookup, structural math, and welding heat input.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
