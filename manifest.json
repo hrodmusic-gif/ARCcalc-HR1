@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 5.21 Beta steel fabrication calculator with CM5-matched stairs, math-integrity repairs, and welding parameters placed above the travel-speed IPM calculator.",
+  "description": "ARCcalc HR1 v1.3 steel fabrication calculator with stair layout, AISC v16.0 shape lookup, structural math, welding heat input, and measured travel speed.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
