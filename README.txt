@@ -1,5 +1,5 @@
 ARCcalc HR1
-5.17 Beta PWA
+5.18 Beta PWA
 
 Open index.html in a browser for a local preview. For installable/offline PWA behavior, serve this folder over HTTPS or localhost.
 
@@ -101,3 +101,9 @@ v5.6 DISPLAY NOTE
 - Removed the legacy top frame highlight that appeared as a divider below the iPhone status bar.
 - Settings now shows only “5.17 Beta” under App version.
 - Logo placement, stretched keypad, and approved bottom bar remain unchanged.
+
+
+## 5.18 Beta
+
+- Added counter-shading beneath the iOS 27 standalone status-bar separator so the system-rendered hairline visually blends into the ARCcalc header.
+- Settings shows only “5.18 Beta” under App version.

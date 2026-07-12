@@ -1,4 +1,4 @@
-# ARCcalc HR1 5.17 Beta
+# ARCcalc HR1 5.18 Beta
 
 - Removed the persistent one-pixel iPhone status-area divider with a dedicated safe-area seam mask.
 - Settings now shows only `5.17 Beta` under App version.
@@ -116,3 +116,9 @@ Safari and Chrome do not guarantee orientation locking for a normal browser tab.
 - Retained a subtle bottom inset only; no geometry or control sizing changed.
 - Simplified the Settings version label to `5.17 Beta`.
 - Bumped the offline cache to `arccalc-hr1-v5-16-beta`.
+
+
+## 5.18 Beta
+
+- Replaced the ineffective same-color safe-area mask with an inverse-luminance compensation strip positioned under the OS-rendered iOS 27 PWA separator.
+- Settings version label is `5.18 Beta`.

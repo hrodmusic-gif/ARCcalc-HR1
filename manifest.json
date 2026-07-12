@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 5.17 Beta steel fabrication calculator with seamless iPhone edge-to-edge presentation.",
+  "description": "ARCcalc HR1 5.18 Beta steel fabrication calculator with iOS Home Screen separator compensation.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
