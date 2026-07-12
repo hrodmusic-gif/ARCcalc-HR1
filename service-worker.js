@@ -1,4 +1,4 @@
-const CACHE_NAME = "arccalc-hr1-v5-10-iphone-full-screen";
+const CACHE_NAME = "arccalc-hr1-v5-11-stretched-keys";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -2,7 +2,7 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 v5.10 steel fabrication calculator with corrected full-screen iPhone Home Screen sizing.",
+  "description": "ARCcalc HR1 v5.11 steel fabrication calculator with compact bottom navigation and full-height keypad rows.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

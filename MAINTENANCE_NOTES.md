@@ -66,3 +66,11 @@ Safari and Chrome do not guarantee orientation locking for a normal browser tab.
 - Removed fullscreen from display_override; iOS uses the supported standalone mode.
 - The HTML canvas and tab bar now share the same bottom surface color.
 - Extra height is distributed evenly through all eight keypad rows.
+
+
+## v5.11 stretched-key layout
+- Reduced the visible bottom navigation controls to a compact 36px height.
+- The navigation background still covers the iPhone Home-indicator safe area.
+- Removed safe-area padding from inside each tab button so the active pill is no longer oversized.
+- Redistributed all reclaimed vertical space evenly across the eight keypad rows.
+- Retained the v5.10 full-screen Home Screen viewport correction.

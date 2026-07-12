@@ -4900,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.10 iPhone Full Screen -->
+  <!-- ARCcalc HR1 v5.11 Stretched Keys -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5441,7 +5441,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>v5.10 <span class="version-pill">iPhone full screen</span></strong>
+                <strong>v5.11 <span class="version-pill">stretched keys</span></strong>
               </div>
             </section>
 
@@ -7605,12 +7605,17 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     }
   </style>
 
-  <style id="arccalc-iphone-full-screen-v510">
-    /* ARCcalc HR1 v5.10 — authoritative phone shell.
-       Browser tabs use the visible dynamic viewport. Installed/Home Screen
-       mode uses 100vh, which represents the complete standalone screen and
-       avoids the iOS 100dvh short-height bug. */
-    :root{--arc-layout-height:var(--arc-live-height,100dvh)}
+  <style id="arccalc-stretched-keys-v511">
+    /* ARCcalc HR1 v5.11 — compact bottom navigation and taller keys.
+       The navigation surface still covers the iPhone Home-indicator safe area,
+       but the visible tab buttons use a compact 42px control row. Every pixel
+       reclaimed from navigation is automatically distributed across all eight
+       keypad rows by the minmax(0,1fr) grid. */
+    :root{
+      --arc-layout-height:var(--arc-live-height,100dvh);
+      --arc-tab-control-height:42px;
+      --arc-tab-row-height:calc(var(--arc-tab-control-height) + var(--arc-ui-bottom));
+    }
 
     @media(max-width:520px) and (orientation:portrait){
       html:not(.arc-installed),
@@ -7622,7 +7627,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
         overflow:hidden!important;
       }
       .calculator{
-        grid-template-rows:auto auto minmax(0,1fr) calc(clamp(58px,7vh,66px) + var(--arc-ui-bottom))!important;
+        grid-template-rows:auto auto minmax(0,1fr) var(--arc-tab-row-height)!important;
       }
       .keypad{
         min-height:0!important;
@@ -7639,9 +7644,29 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       }
       .app-tabs{
         align-self:stretch!important;
+        align-items:start!important;
         min-height:0!important;
         max-height:100%!important;
+        height:100%!important;
+        margin:0!important;
+        padding:3px 5px var(--arc-ui-bottom)!important;
+        box-sizing:border-box!important;
+        overflow:hidden!important;
+        background:#070d15!important;
       }
+      .app-tab{
+        align-self:start!important;
+        height:calc(var(--arc-tab-control-height) - 6px)!important;
+        min-height:calc(var(--arc-tab-control-height) - 6px)!important;
+        max-height:calc(var(--arc-tab-control-height) - 6px)!important;
+        padding:0 4px!important;
+        border-radius:11px!important;
+        box-sizing:border-box!important;
+        font-size:clamp(10px,2.8vw,12px)!important;
+        line-height:1!important;
+        gap:5px!important;
+      }
+      .tab-icon{font-size:clamp(13px,3.8vw,16px)!important}
     }
 
     @media(max-width:520px) and (orientation:portrait){
@@ -7656,8 +7681,6 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
         margin:0!important;
         padding:0!important;
         overflow:hidden!important;
-        /* This is also the WebKit canvas color below the document. Matching
-           it to the tab bar prevents a system-black seam during launch. */
         background:#070d15!important;
         background-color:#070d15!important;
       }
@@ -7698,21 +7721,31 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
         max-height:none!important;
         margin:0!important;
         overflow:hidden!important;
-        grid-template-rows:auto auto minmax(0,1fr) calc(clamp(58px,7vh,66px) + var(--arc-ui-bottom))!important;
+        grid-template-rows:auto auto minmax(0,1fr) var(--arc-tab-row-height)!important;
       }
       html.arc-installed .app-tabs{
         margin:0!important;
         border-bottom-left-radius:0!important;
         border-bottom-right-radius:0!important;
         background:#070d15!important;
-        /* Carry the same surface through the Home-indicator canvas even on
-           WebKit frames that composite a few pixels beyond the layout box. */
         box-shadow:0 96px 0 #070d15!important;
+      }
+    }
+
+    /* Keep the navigation compact even on short legacy iPhones. */
+    @media(max-width:520px) and (orientation:portrait) and (max-height:700px){
+      :root{--arc-tab-control-height:40px}
+      .app-tabs{padding-top:2px!important}
+      .app-tab{
+        height:36px!important;
+        min-height:36px!important;
+        max-height:36px!important;
+        font-size:10px!important;
       }
     }
   </style>
 
-  <script id="arccalc-responsive-runtime-v510">
+  <script id="arccalc-responsive-runtime-v511">
   (()=>{
     const root=document.documentElement;
     const body=document.body;
