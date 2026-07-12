@@ -2,16 +2,12 @@
   "id": "./",
   "name": "ARCcalc HR1",
   "short_name": "ARCcalc",
-  "description": "ARCcalc HR1 v5.9 steel fabrication calculator with corrected iPhone standalone viewport filling.",
+  "description": "ARCcalc HR1 v5.10 steel fabrication calculator with corrected full-screen iPhone Home Screen sizing.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "fullscreen",
-    "standalone"
-  ],
   "orientation": "portrait-primary",
-  "background_color": "#222b38",
+  "background_color": "#070d15",
   "theme_color": "#222b38",
   "categories": [
     "productivity",

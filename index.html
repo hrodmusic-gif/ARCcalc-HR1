@@ -18,13 +18,16 @@
   <meta name="application-name" content="ARCcalc HR1">
   <meta name="msapplication-TileColor" content="#151d28">
   <meta name="msapplication-tap-highlight" content="no">
-  <script id="arccalc-installed-mode-early-v59">
+  <script id="arccalc-installed-mode-early-v510">
     try{
-      if(navigator.standalone===true ||
-         matchMedia('(display-mode:standalone)').matches ||
-         matchMedia('(display-mode:fullscreen)').matches){
-        document.documentElement.classList.add('arc-installed');
-      }
+      const root=document.documentElement;
+      const ios=/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+      const installed=navigator.standalone===true ||
+        matchMedia('(display-mode:standalone)').matches ||
+        matchMedia('(display-mode:fullscreen)').matches;
+      if(ios)root.classList.add('arc-ios');
+      if(installed)root.classList.add('arc-installed');
     }catch(_){}
   </script>
 
@@ -4897,7 +4900,7 @@ body:after{
 <!-- ARCcalc HR1 v4.8 CM5 Weight Division -->
 <!-- ARCcalc HR1 v4.9 Remove T Dimension From Shape Diagram -->
 <!-- ARCcalc HR1 v5.1 Stability Repair -->
-  <!-- ARCcalc HR1 v5.9 iPhone Standalone Fill -->
+  <!-- ARCcalc HR1 v5.10 iPhone Full Screen -->
 
   <style id="arccalc-responsive-v52">
     /* ARCcalc HR1 v5.6 — final cross-device responsive layer. */
@@ -5438,7 +5441,7 @@ body:after{
               </div>
               <div class="settings-static">
                 <span>App version</span>
-                <strong>v5.9 <span class="version-pill">standalone fill</span></strong>
+                <strong>v5.10 <span class="version-pill">iPhone full screen</span></strong>
               </div>
             </section>
 
@@ -7602,12 +7605,11 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
     }
   </style>
 
-  <style id="arccalc-standalone-fill-v59">
-    /* ARCcalc HR1 v5.9 — iOS Home Screen fill.
-       The installed app is anchored with inset:0 to the layout viewport.
-       Do not turn visualViewport.height into the document height: on iOS it can
-       be smaller than the layout viewport and creates the black strip seen in
-       v5.8. visualViewport remains useful only for keyboard detection. */
+  <style id="arccalc-iphone-full-screen-v510">
+    /* ARCcalc HR1 v5.10 — authoritative phone shell.
+       Browser tabs use the visible dynamic viewport. Installed/Home Screen
+       mode uses 100vh, which represents the complete standalone screen and
+       avoids the iOS 100dvh short-height bug. */
     :root{--arc-layout-height:var(--arc-live-height,100dvh)}
 
     @media(max-width:520px) and (orientation:portrait){
@@ -7620,7 +7622,7 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
         overflow:hidden!important;
       }
       .calculator{
-        grid-template-rows:auto auto minmax(0,1fr) calc(clamp(58px,7dvh,66px) + var(--arc-ui-bottom))!important;
+        grid-template-rows:auto auto minmax(0,1fr) calc(clamp(58px,7vh,66px) + var(--arc-ui-bottom))!important;
       }
       .keypad{
         min-height:0!important;
@@ -7636,44 +7638,48 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
         max-height:none!important;
       }
       .app-tabs{
-        align-self:end!important;
+        align-self:stretch!important;
         min-height:0!important;
         max-height:100%!important;
       }
     }
 
-    /* iPhone/Android Home Screen mode: fill the real layout viewport by
-       geometry (inset:0), not by a JS-measured pixel height. */
     @media(max-width:520px) and (orientation:portrait){
       html.arc-installed{
-        position:relative!important;
+        --arc-live-height:100vh;
+        position:static!important;
         inset:auto!important;
         width:100%!important;
-        height:100%!important;
-        min-height:100%!important;
-        max-height:none!important;
+        height:100vh!important;
+        min-height:100vh!important;
+        max-height:100vh!important;
         margin:0!important;
         padding:0!important;
         overflow:hidden!important;
-        background:var(--arc-phone-surface)!important;
+        /* This is also the WebKit canvas color below the document. Matching
+           it to the tab bar prevents a system-black seam during launch. */
+        background:#070d15!important;
+        background-color:#070d15!important;
       }
       html.arc-installed body{
-        position:fixed!important;
-        inset:0!important;
-        width:auto!important;
-        height:auto!important;
-        min-height:0!important;
-        max-height:none!important;
+        position:relative!important;
+        inset:auto!important;
+        display:block!important;
+        width:100%!important;
+        height:100vh!important;
+        min-height:100vh!important;
+        max-height:100vh!important;
         margin:0!important;
         padding:0!important;
         overflow:hidden!important;
         background:var(--arc-phone-surface)!important;
+        background-color:#101720!important;
       }
       html.arc-installed .wrap{
-        position:fixed!important;
+        position:absolute!important;
         inset:0!important;
-        width:auto!important;
-        height:auto!important;
+        width:100%!important;
+        height:100%!important;
         min-height:0!important;
         max-height:none!important;
         margin:0!important;
@@ -7684,25 +7690,29 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       html.arc-installed .calculator{
         position:absolute!important;
         inset:0!important;
-        width:auto!important;
-        height:auto!important;
+        width:100%!important;
+        height:100%!important;
         min-width:0!important;
         min-height:0!important;
         max-width:none!important;
         max-height:none!important;
         margin:0!important;
         overflow:hidden!important;
+        grid-template-rows:auto auto minmax(0,1fr) calc(clamp(58px,7vh,66px) + var(--arc-ui-bottom))!important;
       }
       html.arc-installed .app-tabs{
-        margin-bottom:0!important;
+        margin:0!important;
         border-bottom-left-radius:0!important;
         border-bottom-right-radius:0!important;
         background:#070d15!important;
+        /* Carry the same surface through the Home-indicator canvas even on
+           WebKit frames that composite a few pixels beyond the layout box. */
+        box-shadow:0 96px 0 #070d15!important;
       }
     }
   </style>
 
-  <script id="arccalc-responsive-runtime-v59">
+  <script id="arccalc-responsive-runtime-v510">
   (()=>{
     const root=document.documentElement;
     const body=document.body;
@@ -7713,6 +7723,10 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
 
     function coarsePointer(){
       return matchMedia('(pointer:coarse)').matches || navigator.maxTouchPoints>0;
+    }
+    function isIOS(){
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+             (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
     }
     function installed(){
       return matchMedia('(display-mode:standalone)').matches ||
@@ -7746,15 +7760,15 @@ document.addEventListener('click',function(e){const chip=e.target.closest('[data
       raf=0;
       const v=viewport();
       root.classList.toggle('arc-installed',v.isInstalled);
+      root.classList.toggle('arc-ios',isIOS());
       root.classList.toggle('arc-keyboard-open',v.keyboardOpen);
       body.classList.toggle('arc-keyboard-open',v.keyboardOpen);
 
-      /* Installed PWAs are intentionally not assigned a visualViewport pixel
-         height. CSS inset:0 fills the layout viewport and avoids double
-         subtracting iOS system/safe-area space. */
+      /* Home Screen apps use CSS 100vh. Do not replace it with innerHeight,
+         visualViewport.height, 100dvh, or a measured pixel value. */
       if(v.isInstalled){
-        root.style.removeProperty('--arc-live-height');
-        root.style.removeProperty('--arc-viewport-height');
+        root.style.setProperty('--arc-live-height','100vh');
+        root.style.setProperty('--arc-viewport-height','100vh');
       }else{
         const height=v.keyboardOpen?v.visibleHeight:v.layoutHeight;
         root.style.setProperty('--arc-live-height',height+'px');

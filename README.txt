@@ -49,3 +49,12 @@ v5.6 DISPLAY NOTE
 - visualViewport is used only to detect an on-screen keyboard.
 - Extra height continues to be distributed through the eight keypad rows.
 - Bottom tabs and safe-area padding remain fully visible.
+
+
+## v5.10 iPhone full-screen correction
+- Replaced 100dvh with 100vh only in installed/Home Screen mode.
+- This restores the top safe-area height that iOS was subtracting and removes the bottom strip.
+- Kept 100dvh/visual viewport sizing for ordinary mobile browser tabs.
+- Removed fullscreen from display_override; iOS uses the supported standalone mode.
+- The HTML canvas and tab bar now share the same bottom surface color.
+- Extra height is distributed evenly through all eight keypad rows.
