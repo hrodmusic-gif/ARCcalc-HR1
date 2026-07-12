@@ -74,3 +74,10 @@ v5.6 DISPLAY NOTE
 - Retained enough clearance for the iPhone Home indicator without reserving the entire safe area as blank space.
 - Returned the reclaimed height to all eight keypad rows.
 - Kept the v5.10/v5.11 full-screen standalone viewport correction.
+
+
+## v5.13 unified top surface
+- Matched the HTML theme color, PWA theme color, startup background, and phone canvas to #222b38.
+- Replaced the diagonal phone background at the top edge with a vertically blended surface whose first color is uniform across the full width.
+- Removed the one-pixel calculator case outline at the installed-app top edge.
+- Preserved the approved v5.12 bottom navigation dimensions and full-height keypad.
